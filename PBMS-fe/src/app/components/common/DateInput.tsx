@@ -16,7 +16,7 @@ export function DateInput({ value, onChange, label }: DateInputProps) {
         <input
           type="date"
           value={value}
-          onChange={e => onChange(e.target.value)}
+          onChange={(e) => onChange(e.target.value)}
           className={`${cls.input} pr-7 w-[138px]`}
         />
         <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />

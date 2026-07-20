@@ -18,7 +18,15 @@ interface DataTableProps {
   allSelected?: boolean;
 }
 
-export function DataTable({ columns, data, hasCheckbox, selectedRows, onSelectRow, onSelectAll, allSelected }: DataTableProps) {
+export function DataTable({
+  columns,
+  data,
+  hasCheckbox,
+  selectedRows,
+  onSelectRow,
+  onSelectAll,
+  allSelected,
+}: DataTableProps) {
   return (
     <div className={cls.tableWrapper}>
       <table className="w-full text-sm border-collapse min-w-max">
@@ -26,11 +34,20 @@ export function DataTable({ columns, data, hasCheckbox, selectedRows, onSelectRo
           <tr className="border-y border-gray-300">
             {hasCheckbox && (
               <th className={`${cls.th} w-8 text-center`}>
-                <input type="checkbox" checked={allSelected} onChange={onSelectAll} className="cursor-pointer" />
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={onSelectAll}
+                  className="cursor-pointer"
+                />
               </th>
             )}
-            {columns.map(col => (
-              <th key={col.key} className={cls.th} style={col.width ? { width: col.width } : {}}>
+            {columns.map((col) => (
+              <th
+                key={col.key}
+                className={cls.th}
+                style={col.width ? { width: col.width } : {}}
+              >
                 {col.label}
               </th>
             ))}
@@ -41,7 +58,11 @@ export function DataTable({ columns, data, hasCheckbox, selectedRows, onSelectRo
             <tr
               key={i}
               className={`border-b border-gray-200 hover:bg-blue-50 transition-colors ${
-                selectedRows?.has(row.id) ? "bg-blue-50" : i % 2 === 1 ? "bg-gray-50" : "bg-white"
+                selectedRows?.has(row.id)
+                  ? "bg-blue-50"
+                  : i % 2 === 1
+                    ? "bg-gray-50"
+                    : "bg-white"
               }`}
             >
               {hasCheckbox && (
@@ -54,9 +75,11 @@ export function DataTable({ columns, data, hasCheckbox, selectedRows, onSelectRo
                   />
                 </td>
               )}
-              {columns.map(col => (
+              {columns.map((col) => (
                 <td key={col.key} className={cls.td}>
-                  {col.render ? col.render(row[col.key], row) : (row[col.key] ?? "")}
+                  {col.render
+                    ? col.render(row[col.key], row)
+                    : (row[col.key] ?? "")}
                 </td>
               ))}
             </tr>

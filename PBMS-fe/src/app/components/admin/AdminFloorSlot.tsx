@@ -6,11 +6,14 @@ import {
   Bike,
   CreditCard,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 
 import { cls } from "../common/ui";
-import { staffService, SlotStatsResponse } from "../../../services/staffService";
+import {
+  staffService,
+  SlotStatsResponse,
+} from "../../../services/staffService";
 
 export default function AdminFloorSlot() {
   const getTodayString = () => {
@@ -119,9 +122,11 @@ export default function AdminFloorSlot() {
             <Car className="h-6 w-6" />
           </div>
           <div>
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tổng slot ô tô</div>
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Tổng slot ô tô
+            </div>
             <div className="text-2xl font-black text-blue-600 mt-1">
-              {loading ? "..." : stats?.totalCarSlots ?? 0}
+              {loading ? "..." : (stats?.totalCarSlots ?? 0)}
             </div>
           </div>
         </div>
@@ -132,9 +137,11 @@ export default function AdminFloorSlot() {
             <Bike className="h-6 w-6" />
           </div>
           <div>
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tổng slot xe máy</div>
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Tổng slot xe máy
+            </div>
             <div className="text-2xl font-black text-green-600 mt-1">
-              {loading ? "..." : stats?.totalMotorcycleSlots ?? 0}
+              {loading ? "..." : (stats?.totalMotorcycleSlots ?? 0)}
             </div>
           </div>
         </div>
@@ -165,7 +172,10 @@ export default function AdminFloorSlot() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-gray-400 text-sm">
+                  <td
+                    colSpan={5}
+                    className="px-4 py-12 text-center text-gray-400 text-sm"
+                  >
                     <div className="flex justify-center items-center gap-2">
                       <RefreshCw className="h-4 w-4 animate-spin text-blue-500" />
                       Đang tải thống kê...
@@ -174,13 +184,19 @@ export default function AdminFloorSlot() {
                 </tr>
               ) : !stats || stats.floorStats.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-gray-400 text-sm">
+                  <td
+                    colSpan={5}
+                    className="px-4 py-12 text-center text-gray-400 text-sm"
+                  >
                     Không tìm thấy dữ liệu thống kê nào.
                   </td>
                 </tr>
               ) : (
                 stats.floorStats.map((floor) => (
-                  <tr key={floor.floorId} className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                  <tr
+                    key={floor.floorId}
+                    className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors"
+                  >
                     {/* Tầng */}
                     <td className="px-4 py-3.5 text-sm font-extrabold text-blue-600 whitespace-nowrap">
                       {floor.floorCode}

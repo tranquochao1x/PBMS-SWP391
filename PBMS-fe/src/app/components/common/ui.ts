@@ -1,13 +1,22 @@
 export const cls = {
-  input: "h-[34px] border border-gray-300 rounded px-2 text-sm bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100",
-  select: "h-[34px] border border-gray-300 rounded px-2 text-sm bg-white cursor-pointer focus:outline-none focus:border-blue-400",
-  btnSearch: "h-[34px] px-3 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
-  btnExport: "h-[34px] px-3 bg-green-600 hover:bg-green-700 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
-  btnReset: "h-[34px] px-3 bg-gray-400 hover:bg-gray-500 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
-  btnAdd: "h-[34px] px-3 bg-sky-500 hover:bg-sky-600 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
-  btnDanger: "h-[34px] px-3 bg-red-500 hover:bg-red-600 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
-  btnWarning: "h-[34px] px-3 bg-amber-500 hover:bg-amber-600 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
-  btnSecondary: "h-[34px] px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded border border-gray-300 flex items-center gap-1.5 cursor-pointer",
+  input:
+    "h-[34px] border border-gray-300 rounded px-2 text-sm bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100",
+  select:
+    "h-[34px] border border-gray-300 rounded px-2 text-sm bg-white cursor-pointer focus:outline-none focus:border-blue-400",
+  btnSearch:
+    "h-[34px] px-3 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
+  btnExport:
+    "h-[34px] px-3 bg-green-600 hover:bg-green-700 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
+  btnReset:
+    "h-[34px] px-3 bg-gray-400 hover:bg-gray-500 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
+  btnAdd:
+    "h-[34px] px-3 bg-sky-500 hover:bg-sky-600 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
+  btnDanger:
+    "h-[34px] px-3 bg-red-500 hover:bg-red-600 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
+  btnWarning:
+    "h-[34px] px-3 bg-amber-500 hover:bg-amber-600 text-white text-sm rounded flex items-center gap-1.5 cursor-pointer",
+  btnSecondary:
+    "h-[34px] px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded border border-gray-300 flex items-center gap-1.5 cursor-pointer",
   pageWrapper: "flex flex-col h-full",
   sectionCard: "bg-white border border-gray-200 rounded shadow-sm",
   filterSection: "bg-white border border-gray-200 rounded p-3 mb-3 shadow-sm",
@@ -15,11 +24,14 @@ export const cls = {
   th: "px-2 py-2 text-left text-xs font-semibold text-gray-600 border-r border-gray-200 last:border-r-0 whitespace-nowrap bg-gray-100",
   td: "px-2 py-1.5 text-sm border-r border-gray-200 last:border-r-0 whitespace-nowrap",
   badge: {
-    green: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700",
+    green:
+      "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700",
     red: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700",
     blue: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700",
-    amber: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700",
+    amber:
+      "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700",
     gray: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600",
-    purple: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700",
+    purple:
+      "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700",
   },
 };

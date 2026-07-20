@@ -54,7 +54,7 @@ export default function CardViolationRules() {
   const generateSingleDescription = (
     vehicleType: string,
     maxHours: number,
-    penalty: number
+    penalty: number,
   ): string => {
     const vehicle = vehicleType === "MOTORCYCLE" ? "xe máy" : "ô tô";
     const penaltyStr = penalty.toLocaleString("vi-VN") + "đ";
@@ -78,8 +78,13 @@ export default function CardViolationRules() {
     }
 
     try {
-      const updatedRule = await violationRuleService.updateRule(editingRule.id, editingRule);
-      setRules(prev => prev.map(r => (r.id === updatedRule.id ? updatedRule : r)));
+      const updatedRule = await violationRuleService.updateRule(
+        editingRule.id,
+        editingRule,
+      );
+      setRules((prev) =>
+        prev.map((r) => (r.id === updatedRule.id ? updatedRule : r)),
+      );
       setEditingRule(null);
       setErrorMsg(null);
       setSuccessMsg("Cập nhật luật vi phạm thẻ thành công!");
@@ -90,7 +95,9 @@ export default function CardViolationRules() {
   };
 
   return (
-    <div className={`${cls.pageWrapper} px-6 py-4 bg-gray-50/50 min-h-screen space-y-5`}>
+    <div
+      className={`${cls.pageWrapper} px-6 py-4 bg-gray-50/50 min-h-screen space-y-5`}
+    >
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-gray-200 pb-3">
         <div className="flex items-center gap-2.5">
@@ -98,8 +105,13 @@ export default function CardViolationRules() {
             <ShieldAlert className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-800">Quy Định Vi Phạm Thẻ</h1>
-            <p className="text-xs text-gray-500">Thiết lập các mức phạt quá giờ đỗ đối với thẻ lượt, thẻ ngày và thẻ tháng</p>
+            <h1 className="text-xl font-bold text-gray-800">
+              Quy Định Vi Phạm Thẻ
+            </h1>
+            <p className="text-xs text-gray-500">
+              Thiết lập các mức phạt quá giờ đỗ đối với thẻ lượt, thẻ ngày và
+              thẻ tháng
+            </p>
           </div>
         </div>
       </div>
@@ -129,28 +141,39 @@ export default function CardViolationRules() {
           {rules.map((rule) => {
             const isMoto = rule.vehicleType === "MOTORCYCLE";
             const isSingle = rule.ticketType === "SINGLE";
-            
+
             return (
-              <div 
+              <div
                 key={rule.id}
                 className="bg-white border border-gray-200 hover:border-blue-300 rounded-lg p-4 shadow-sm transition-all flex flex-col justify-between"
               >
                 <div>
                   {/* Badge header */}
                   <div className="flex justify-between items-start gap-2 mb-2.5">
-                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase ${
-                      rule.ticketType === "SINGLE" 
-                        ? "bg-amber-100 text-amber-800 border border-amber-200" 
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase ${
+                        rule.ticketType === "SINGLE"
+                          ? "bg-amber-100 text-amber-800 border border-amber-200"
+                          : rule.ticketType === "DAY"
+                            ? "bg-blue-100 text-blue-800 border border-blue-200"
+                            : "bg-purple-100 text-purple-800 border border-purple-200"
+                      }`}
+                    >
+                      Thẻ{" "}
+                      {rule.ticketType === "SINGLE"
+                        ? "lượt"
                         : rule.ticketType === "DAY"
-                        ? "bg-blue-100 text-blue-800 border border-blue-200"
-                        : "bg-purple-100 text-purple-800 border border-purple-200"
-                    }`}>
-                      Thẻ {rule.ticketType === "SINGLE" ? "lượt" : rule.ticketType === "DAY" ? "ngày" : "tháng"}
+                          ? "ngày"
+                          : "tháng"}
                     </span>
 
-                    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-                      rule.isActive ? "bg-green-50 text-green-700 border border-green-200" : "bg-gray-100 text-gray-500 border border-gray-200"
-                    }`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                        rule.isActive
+                          ? "bg-green-50 text-green-700 border border-green-200"
+                          : "bg-gray-100 text-gray-500 border border-gray-200"
+                      }`}
+                    >
                       {rule.isActive ? "Đang áp dụng" : "Tạm dừng"}
                     </span>
                   </div>
@@ -177,12 +200,20 @@ export default function CardViolationRules() {
                     {isSingle && (
                       <div className="flex items-center gap-1 text-[11px] text-gray-500">
                         <Clock className="h-3 w-3 text-gray-400" />
-                        <span>Cho phép: <strong>{rule.maxDurationHours} giờ</strong></span>
+                        <span>
+                          Cho phép: <strong>{rule.maxDurationHours} giờ</strong>
+                        </span>
                       </div>
                     )}
                     <div className="flex items-center gap-1 text-[11px] text-gray-500">
                       <Coins className="h-3 w-3 text-amber-500" />
-                      <span>Phạt: <strong className="text-red-600 text-xs">{rule.penaltyPerHour.toLocaleString("vi-VN")}đ</strong>/giờ</span>
+                      <span>
+                        Phạt:{" "}
+                        <strong className="text-red-600 text-xs">
+                          {rule.penaltyPerHour.toLocaleString("vi-VN")}đ
+                        </strong>
+                        /giờ
+                      </span>
                     </div>
                   </div>
 
@@ -231,7 +262,9 @@ export default function CardViolationRules() {
 
               {/* Rule Name (disabled) */}
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-gray-500 uppercase">Tên quy tắc</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase">
+                  Tên quy tắc
+                </label>
                 <input
                   type="text"
                   value={editingRule.ruleName}
@@ -253,19 +286,32 @@ export default function CardViolationRules() {
                       value={editingRule.maxDurationHours}
                       onChange={(e) => {
                         const newHours = parseInt(e.target.value) || 0;
-                        setEditingRule(prev => {
+                        setEditingRule((prev) => {
                           if (!prev) return null;
-                          const newDesc = prev.ticketType === "SINGLE"
-                            ? generateSingleDescription(prev.vehicleType, newHours, prev.penaltyPerHour)
-                            : prev.description;
-                          return { ...prev, maxDurationHours: newHours, description: newDesc };
+                          const newDesc =
+                            prev.ticketType === "SINGLE"
+                              ? generateSingleDescription(
+                                  prev.vehicleType,
+                                  newHours,
+                                  prev.penaltyPerHour,
+                                )
+                              : prev.description;
+                          return {
+                            ...prev,
+                            maxDurationHours: newHours,
+                            description: newDesc,
+                          };
                         });
                       }}
                       className={`${cls.input} w-full pr-10`}
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">giờ</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">
+                      giờ
+                    </span>
                   </div>
-                  <p className="text-[10px] text-gray-400">Thời gian xe được đỗ miễn phí trước khi bị phạt.</p>
+                  <p className="text-[10px] text-gray-400">
+                    Thời gian xe được đỗ miễn phí trước khi bị phạt.
+                  </p>
                 </div>
               )}
 
@@ -282,28 +328,41 @@ export default function CardViolationRules() {
                     value={editingRule.penaltyPerHour}
                     onChange={(e) => {
                       const newPenalty = parseInt(e.target.value) || 0;
-                      setEditingRule(prev => {
+                      setEditingRule((prev) => {
                         if (!prev) return null;
-                        const newDesc = prev.ticketType === "SINGLE"
-                          ? generateSingleDescription(prev.vehicleType, prev.maxDurationHours, newPenalty)
-                          : prev.description;
-                        return { ...prev, penaltyPerHour: newPenalty, description: newDesc };
+                        const newDesc =
+                          prev.ticketType === "SINGLE"
+                            ? generateSingleDescription(
+                                prev.vehicleType,
+                                prev.maxDurationHours,
+                                newPenalty,
+                              )
+                            : prev.description;
+                        return {
+                          ...prev,
+                          penaltyPerHour: newPenalty,
+                          description: newDesc,
+                        };
                       });
                     }}
                     className={`${cls.input} w-full pr-14`}
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">VND/h</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">
+                    VND/h
+                  </span>
                 </div>
               </div>
 
               {/* Rule Description */}
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-gray-600 uppercase">Mô tả hiển thị</label>
+                <label className="block text-xs font-semibold text-gray-600 uppercase">
+                  Mô tả hiển thị
+                </label>
                 <textarea
                   value={editingRule.description}
                   onChange={(e) =>
-                    setEditingRule(prev =>
-                      prev ? { ...prev, description: e.target.value } : null
+                    setEditingRule((prev) =>
+                      prev ? { ...prev, description: e.target.value } : null,
                     )
                   }
                   rows={3}
@@ -319,13 +378,16 @@ export default function CardViolationRules() {
                   id="rule-active-toggle"
                   checked={editingRule.isActive}
                   onChange={(e) =>
-                    setEditingRule(prev =>
-                      prev ? { ...prev, isActive: e.target.checked } : null
+                    setEditingRule((prev) =>
+                      prev ? { ...prev, isActive: e.target.checked } : null,
                     )
                   }
                   className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                 />
-                <label htmlFor="rule-active-toggle" className="text-xs font-semibold text-gray-700 cursor-pointer uppercase">
+                <label
+                  htmlFor="rule-active-toggle"
+                  className="text-xs font-semibold text-gray-700 cursor-pointer uppercase"
+                >
                   Kích hoạt áp dụng quy tắc này
                 </label>
               </div>
