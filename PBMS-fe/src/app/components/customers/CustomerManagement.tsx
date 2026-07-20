@@ -113,7 +113,7 @@ function CustomerCardsModal({
             ngayHetHan: item.ngayHetHan || "",
             trangThai: item.trangThai || "Khóa",
             ghiChu: item.note || "",
-          }))
+          })),
         );
       } catch (err: any) {
         setError(err.message || "Không thể tải danh sách thẻ.");
@@ -130,7 +130,7 @@ function CustomerCardsModal({
       <div className="flex max-h-[85vh] w-[680px] flex-col rounded-lg bg-white shadow-xl">
         <div className="flex flex-shrink-0 items-center justify-between rounded-t-lg bg-blue-600 px-5 py-3">
           <div className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-white" />
+            <CreditCard className="h-4 w-4 text-white" />
             <span className="text-sm font-semibold text-white">
               Thẻ của khách hàng: {customer.hoTen}
             </span>
@@ -151,23 +151,17 @@ function CustomerCardsModal({
         <div className="flex flex-shrink-0 gap-6 border-b border-blue-200 bg-blue-50 px-5 py-2 text-xs text-gray-600">
           <span>
             <span className="text-gray-400">Mã KH:</span>{" "}
-            <span className="font-medium text-gray-800">
-              {customer.maKH}
-            </span>
+            <span className="font-medium text-gray-800">{customer.maKH}</span>
           </span>
 
           <span>
             <span className="text-gray-400">SĐT:</span>{" "}
-            <span className="font-medium text-gray-800">
-              {customer.sdt}
-            </span>
+            <span className="font-medium text-gray-800">{customer.sdt}</span>
           </span>
 
           <span>
             <span className="text-gray-400">Địa chỉ:</span>{" "}
-            <span className="font-medium text-gray-800">
-              {customer.diaChi}
-            </span>
+            <span className="font-medium text-gray-800">{customer.diaChi}</span>
           </span>
         </div>
 
@@ -213,9 +207,7 @@ function CustomerCardsModal({
                       </span>
                     </td>
                     <td className={cls.td}>
-                      <span className={cls.badge.blue}>
-                        {card.nhomThe}
-                      </span>
+                      <span className={cls.badge.blue}>{card.nhomThe}</span>
                     </td>
                     <td className={cls.td}>{card.bienSo}</td>
                     <td className={cls.td}>
@@ -258,11 +250,7 @@ function CustomerCardsModal({
         </div>
 
         <div className="flex flex-shrink-0 justify-end border-t border-gray-200 px-5 py-3">
-          <button
-            type="button"
-            className={cls.btnSecondary}
-            onClick={onClose}
-          >
+          <button type="button" className={cls.btnSecondary} onClick={onClose}>
             Đóng
           </button>
         </div>
@@ -292,8 +280,10 @@ export default function CustomerManagement() {
     setError("");
     try {
       const list = await adminCardService.getUsers();
-      const customersOnly = list.filter(item => item.roleName === "USER");
-      setData(customersOnly.map((item, index) => mapDtoToCustomer(item, index)));
+      const customersOnly = list.filter((item) => item.roleName === "USER");
+      setData(
+        customersOnly.map((item, index) => mapDtoToCustomer(item, index)),
+      );
     } catch (err: any) {
       setError(err.message || "Không thể tải danh sách khách hàng.");
     } finally {
@@ -314,8 +304,7 @@ export default function CustomerManagement() {
       customer.hoTen.toLowerCase().includes(searchValue) ||
       customer.sdt.includes(searchValue);
 
-    const matchStatus =
-      !trangThai || customer.trangThai === trangThai;
+    const matchStatus = !trangThai || customer.trangThai === trangThai;
 
     return matchKeyword && matchStatus;
   });
@@ -369,7 +358,10 @@ export default function CustomerManagement() {
           roleName: form.roleName || editItem.roleName || "USER",
           phone: form.sdt.trim(),
           email: form.email.trim() || undefined,
-          password: form.password && form.password.length >= 6 ? form.password : undefined,
+          password:
+            form.password && form.password.length >= 6
+              ? form.password
+              : undefined,
           status: editItem.trangThai === "Hoạt động" ? "ACTIVE" : "INACTIVE",
           address: form.diaChi.trim() || undefined,
         };
@@ -453,9 +445,7 @@ export default function CustomerManagement() {
       label: "Trạng thái",
       render: (value: string) => (
         <span
-          className={
-            value === "Hoạt động" ? cls.badge.green : cls.badge.red
-          }
+          className={value === "Hoạt động" ? cls.badge.green : cls.badge.red}
         >
           {value}
         </span>
@@ -553,11 +543,7 @@ export default function CustomerManagement() {
             Reset
           </button>
 
-          <button
-            type="button"
-            className={cls.btnAdd}
-            onClick={openAdd}
-          >
+          <button type="button" className={cls.btnAdd} onClick={openAdd}>
             <Plus className="h-3.5 w-3.5" />
             Thêm mới
           </button>
@@ -624,7 +610,7 @@ export default function CustomerManagement() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-[440px] rounded-lg bg-white shadow-xl">
             <div className="flex items-center justify-between rounded-t-lg bg-blue-600 px-5 py-3">
-                <span className="text-sm font-semibold text-white">
+              <span className="text-sm font-semibold text-white">
                 Thông tin khách hàng
               </span>
 
@@ -650,7 +636,9 @@ export default function CustomerManagement() {
                   <span className="w-36 flex-shrink-0 pt-0.5 text-xs text-gray-500 text-left">
                     {label}:
                   </span>
-                  <span className="font-medium text-gray-800 text-left">{value}</span>
+                  <span className="font-medium text-gray-800 text-left">
+                    {value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -776,8 +764,6 @@ export default function CustomerManagement() {
                 </div>
               )}
 
-
-
               <div>
                 <label className="mb-1 block text-xs text-gray-600">
                   Địa chỉ
@@ -806,7 +792,7 @@ export default function CustomerManagement() {
                     onChange={(event) => {
                       const newStatus = event.target.value;
                       setEditItem((prev) =>
-                        prev ? { ...prev, trangThai: newStatus } : null
+                        prev ? { ...prev, trangThai: newStatus } : null,
                       );
                     }}
                   >
@@ -877,7 +863,8 @@ export default function CustomerManagement() {
                     Xác nhận vô hiệu hóa
                   </p>
                   <p className="mt-0.5 text-xs text-gray-500">
-                    Bạn có chắc muốn vô hiệu hóa khách hàng này không? (Trạng thái sẽ đổi sang Khóa)
+                    Bạn có chắc muốn vô hiệu hóa khách hàng này không? (Trạng
+                    thái sẽ đổi sang Khóa)
                   </p>
                 </div>
               </div>

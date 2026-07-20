@@ -37,7 +37,9 @@ export default function PaymentCancel() {
             <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Mã đơn hàng (đã hủy)</span>
-                <span className="font-mono font-semibold text-gray-700">{orderCode}</span>
+                <span className="font-mono font-semibold text-gray-700">
+                  {orderCode}
+                </span>
               </div>
             </div>
           )}

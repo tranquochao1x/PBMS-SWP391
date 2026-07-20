@@ -10,9 +10,9 @@ interface VnPaySuccessParams {
 function parseQueryParams(): VnPaySuccessParams {
   const params = new URLSearchParams(window.location.search);
   return {
-    vnp_ResponseCode:  params.get("vnp_ResponseCode")  ?? undefined,
+    vnp_ResponseCode: params.get("vnp_ResponseCode") ?? undefined,
     vnp_TransactionNo: params.get("vnp_TransactionNo") ?? undefined,
-    vnp_TxnRef:        params.get("vnp_TxnRef")        ?? undefined,
+    vnp_TxnRef: params.get("vnp_TxnRef") ?? undefined,
   };
 }
 
@@ -61,18 +61,24 @@ export default function PaymentSuccess() {
             {params.vnp_TxnRef && (
               <div className="flex justify-between">
                 <span className="text-gray-500">Mã đơn hàng</span>
-                <span className="font-mono font-semibold text-gray-800">{params.vnp_TxnRef}</span>
+                <span className="font-mono font-semibold text-gray-800">
+                  {params.vnp_TxnRef}
+                </span>
               </div>
             )}
             {params.vnp_TransactionNo && (
               <div className="flex justify-between">
                 <span className="text-gray-500">Mã giao dịch VNPay</span>
-                <span className="font-mono text-xs text-gray-700 truncate max-w-[180px]">{params.vnp_TransactionNo}</span>
+                <span className="font-mono text-xs text-gray-700 truncate max-w-[180px]">
+                  {params.vnp_TransactionNo}
+                </span>
               </div>
             )}
             <div className="flex justify-between">
               <span className="text-gray-500">Trạng thái</span>
-              <span className={`font-semibold ${isConfirmed ? "text-emerald-600" : "text-amber-600"}`}>
+              <span
+                className={`font-semibold ${isConfirmed ? "text-emerald-600" : "text-amber-600"}`}
+              >
                 {isConfirmed ? "✓ Thành công" : "Thất bại / Hủy"}
               </span>
             </div>

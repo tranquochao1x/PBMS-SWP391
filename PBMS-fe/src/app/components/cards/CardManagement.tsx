@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { List, RefreshCw, Calendar, Settings2, AlertTriangle } from "lucide-react";
+import {
+  List,
+  RefreshCw,
+  Calendar,
+  Settings2,
+  AlertTriangle,
+} from "lucide-react";
 import CardList from "./CardList";
 import CardRenew from "./CardRenew";
 import MonthlyCards from "../reports/MonthlyCards";
@@ -9,11 +15,11 @@ import CardViolationRules from "./CardViolationRules";
 type Tab = "list" | "renew" | "monthly" | "processing" | "violations";
 
 const tabs: { key: Tab; label: string; icon: typeof List }[] = [
-  { key: "list",       label: "Danh sách thẻ",       icon: List },
-  { key: "renew",      label: "Gia hạn thẻ",          icon: RefreshCw },
-  { key: "monthly",    label: "Thời hạn thẻ tháng",   icon: Calendar },
-  { key: "violations", label: "Quy tắc phạt",        icon: AlertTriangle },
-  { key: "processing", label: "Xử lý thẻ",            icon: Settings2 },
+  { key: "list", label: "Danh sách thẻ", icon: List },
+  { key: "renew", label: "Gia hạn thẻ", icon: RefreshCw },
+  { key: "monthly", label: "Thời hạn thẻ tháng", icon: Calendar },
+  { key: "violations", label: "Quy tắc phạt", icon: AlertTriangle },
+  { key: "processing", label: "Xử lý thẻ", icon: Settings2 },
 ];
 
 export default function CardManagement() {
@@ -23,7 +29,7 @@ export default function CardManagement() {
     <div className="space-y-2">
       {/* Tab bar */}
       <div className="flex gap-0 border-b border-gray-300 bg-white rounded-t shadow-sm">
-        {tabs.map(tab => {
+        {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
           return (
@@ -44,9 +50,9 @@ export default function CardManagement() {
       </div>
 
       {/* Tab content */}
-      {activeTab === "list"       && <CardList />}
-      {activeTab === "renew"      && <CardRenew />}
-      {activeTab === "monthly"    && <MonthlyCards />}
+      {activeTab === "list" && <CardList />}
+      {activeTab === "renew" && <CardRenew />}
+      {activeTab === "monthly" && <MonthlyCards />}
       {activeTab === "violations" && <CardViolationRules />}
       {activeTab === "processing" && <CardProcessing />}
     </div>

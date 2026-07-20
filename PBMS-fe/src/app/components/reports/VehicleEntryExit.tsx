@@ -6,13 +6,8 @@ import { getLocalTodayStr } from "../../../utils/dateUtils";
 import ImageModal from "../common/ImageModal";
 import { DataTable, Column } from "../common/DataTable";
 import { Pagination } from "../common/Pagination";
-import {
-  adminCardService,
-} from "../../../services/adminCardService";
-import {
-  staffService,
-  StaffMinimalDto,
-} from "../../../services/staffService";
+import { adminCardService } from "../../../services/adminCardService";
+import { staffService, StaffMinimalDto } from "../../../services/staffService";
 
 interface ReportRow {
   id: number;
@@ -37,11 +32,7 @@ const formatCurrency = (amount: number): string => {
 
 const moneyCell = (value: number) => (
   <span
-    className={
-      value > 0
-        ? "font-semibold text-green-600"
-        : "text-gray-400"
-    }
+    className={value > 0 ? "font-semibold text-green-600" : "text-gray-400"}
   >
     {formatCurrency(value)}
   </span>
@@ -83,17 +74,18 @@ export default function VehicleEntryExit() {
     {
       key: "entryImage",
       label: "Ảnh xe vào",
-      render: (val: string) => val ? (
-        <button
-          type="button"
-          onClick={() => setSelectedImageUrl(val)}
-          className="text-xs text-blue-600 hover:text-blue-800 underline font-medium"
-        >
-          Xem ảnh
-        </button>
-      ) : (
-        <span className="text-gray-400">—</span>
-      )
+      render: (val: string) =>
+        val ? (
+          <button
+            type="button"
+            onClick={() => setSelectedImageUrl(val)}
+            className="text-xs text-blue-600 hover:text-blue-800 underline font-medium"
+          >
+            Xem ảnh
+          </button>
+        ) : (
+          <span className="text-gray-400">—</span>
+        ),
     },
     { key: "tang", label: "Tầng", width: "60px" },
     { key: "tgVao", label: "Thời gian vào" },
@@ -110,32 +102,34 @@ export default function VehicleEntryExit() {
     {
       key: "entryImage",
       label: "Ảnh xe vào",
-      render: (val: string) => val ? (
-        <button
-          type="button"
-          onClick={() => setSelectedImageUrl(val)}
-          className="text-xs text-blue-600 hover:text-blue-800 underline font-medium"
-        >
-          Xem ảnh
-        </button>
-      ) : (
-        <span className="text-gray-400">—</span>
-      )
+      render: (val: string) =>
+        val ? (
+          <button
+            type="button"
+            onClick={() => setSelectedImageUrl(val)}
+            className="text-xs text-blue-600 hover:text-blue-800 underline font-medium"
+          >
+            Xem ảnh
+          </button>
+        ) : (
+          <span className="text-gray-400">—</span>
+        ),
     },
     {
       key: "exitImage",
       label: "Ảnh xe ra",
-      render: (val: string) => val ? (
-        <button
-          type="button"
-          onClick={() => setSelectedImageUrl(val)}
-          className="text-xs text-blue-600 hover:text-blue-800 underline font-medium"
-        >
-          Xem ảnh
-        </button>
-      ) : (
-        <span className="text-gray-400">—</span>
-      )
+      render: (val: string) =>
+        val ? (
+          <button
+            type="button"
+            onClick={() => setSelectedImageUrl(val)}
+            className="text-xs text-blue-600 hover:text-blue-800 underline font-medium"
+          >
+            Xem ảnh
+          </button>
+        ) : (
+          <span className="text-gray-400">—</span>
+        ),
     },
     { key: "tang", label: "Tầng", width: "60px" },
     { key: "tgVao", label: "Thời gian vào" },
@@ -191,7 +185,7 @@ export default function VehicleEntryExit() {
               : item.exitStaffName || "",
           entryImage: item.entryImage || "",
           exitImage: item.exitImage || "",
-        }))
+        })),
       );
     } catch (err: any) {
       setError(err.message || "Không thể tải báo cáo xe vào/ra.");
@@ -221,7 +215,10 @@ export default function VehicleEntryExit() {
   const currentColumns = tab === "entry" ? entryCols : exitCols;
   const itemsPerPage = 10;
   const totalPages = Math.ceil(data.length / itemsPerPage);
-  const paginatedData = data.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  const paginatedData = data.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage,
+  );
 
   const handleChangeTab = (newTab: "exit" | "entry") => {
     setTab(newTab);
@@ -267,17 +264,9 @@ export default function VehicleEntryExit() {
             />
           </FilterGroup>
 
-          <DateInput
-            label="Từ ngày"
-            value={fromDate}
-            onChange={setFromDate}
-          />
+          <DateInput label="Từ ngày" value={fromDate} onChange={setFromDate} />
 
-          <DateInput
-            label="Đến ngày"
-            value={toDate}
-            onChange={setToDate}
-          />
+          <DateInput label="Đến ngày" value={toDate} onChange={setToDate} />
 
           <FilterGroup label="Nhân viên giám sát">
             <select
@@ -317,11 +306,7 @@ export default function VehicleEntryExit() {
             Tìm kiếm
           </button>
 
-          <button
-            type="button"
-            className={cls.btnReset}
-            onClick={handleReset}
-          >
+          <button type="button" className={cls.btnReset} onClick={handleReset}>
             <RotateCcw className="h-3.5 w-3.5" />
             Reset
           </button>
@@ -351,10 +336,7 @@ export default function VehicleEntryExit() {
             </div>
           ) : (
             <>
-              <DataTable
-                columns={currentColumns}
-                data={paginatedData}
-              />
+              <DataTable columns={currentColumns} data={paginatedData} />
 
               <Pagination
                 currentPage={page}
@@ -371,7 +353,9 @@ export default function VehicleEntryExit() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4">
           <div className="bg-white rounded-lg overflow-hidden shadow-2xl max-w-2xl w-full flex flex-col">
             <div className="px-4 py-2 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-              <span className="text-sm font-semibold text-gray-700">Ảnh xe vào chi tiết</span>
+              <span className="text-sm font-semibold text-gray-700">
+                Ảnh xe vào chi tiết
+              </span>
               <button
                 type="button"
                 onClick={() => setSelectedImageUrl(null)}
