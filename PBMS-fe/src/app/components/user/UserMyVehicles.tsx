@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, X, Car, Bike } from "lucide-react";
-import { cardService, VehicleDto, VehicleRequest } from "../../../services/cardService";
+import {
+  cardService,
+  VehicleDto,
+  VehicleRequest,
+} from "../../../services/cardService";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const VEHICLE_TYPES = [
@@ -13,9 +17,11 @@ function typeLabel(type: string) {
 }
 
 function TypeIcon({ type }: { type: string }) {
-  return type === "CAR"
-    ? <Car className="w-4 h-4 text-blue-500" />
-    : <Bike className="w-4 h-4 text-emerald-500" />;
+  return type === "CAR" ? (
+    <Car className="w-4 h-4 text-blue-500" />
+  ) : (
+    <Bike className="w-4 h-4 text-emerald-500" />
+  );
 }
 
 // ── Plate utilities ───────────────────────────────────────────────────────────
@@ -32,7 +38,7 @@ const CAR_REGEX = /^[1-9]\d[A-Z]{1,2}\d{4,5}$/;
 const MOTO_REGEX = /^[1-9]\d[A-Z]\d\d{4,5}$/;
 
 function validateVehicleForm(
-  form: VehicleRequest
+  form: VehicleRequest,
 ): Partial<Record<keyof VehicleRequest, string>> {
   const errors: Partial<Record<keyof VehicleRequest, string>> = {};
   const normalized = normalizePlateNo(form.plateNo);
@@ -52,14 +58,19 @@ function validateVehicleForm(
       const strictMoto = isMoto && (!isCar || normalized.length === 9);
 
       if (form.vehicleType === "CAR" && !strictCar) {
-        errors.vehicleType = "Biển số này thuộc về Xe máy, không khớp với loại xe đã chọn!";
+        errors.vehicleType =
+          "Biển số này thuộc về Xe máy, không khớp với loại xe đã chọn!";
       } else if (form.vehicleType === "MOTORCYCLE" && !strictMoto) {
-        errors.vehicleType = "Biển số này thuộc về Ô tô, không khớp với loại xe đã chọn!";
+        errors.vehicleType =
+          "Biển số này thuộc về Ô tô, không khớp với loại xe đã chọn!";
       }
     }
   }
 
-  if (!["MOTORCYCLE", "CAR"].includes(form.vehicleType) && !errors.vehicleType) {
+  if (
+    !["MOTORCYCLE", "CAR"].includes(form.vehicleType) &&
+    !errors.vehicleType
+  ) {
     errors.vehicleType = "Vui lòng chọn loại xe hợp lệ.";
   }
   if (form.brand && form.brand.length > 50) {
@@ -94,7 +105,9 @@ function VehicleFormModal({
   });
   const [loading, setLoading] = useState(false);
   const [apiErr, setApiErr] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof VehicleRequest, string>>>({});
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<keyof VehicleRequest, string>>
+  >({});
 
   const F = (k: keyof VehicleRequest, v: string) => {
     setForm((p) => ({ ...p, [k]: v }));
@@ -147,7 +160,9 @@ function VehicleFormModal({
             </label>
             <input
               className={`w-full h-[36px] border rounded px-3 text-sm uppercase focus:outline-none focus:border-blue-400 ${
-                fieldErrors.plateNo ? "border-red-400 bg-red-50" : "border-gray-300"
+                fieldErrors.plateNo
+                  ? "border-red-400 bg-red-50"
+                  : "border-gray-300"
               }`}
               placeholder="VD: 29X1-12345"
               value={form.plateNo}
@@ -184,17 +199,23 @@ function VehicleFormModal({
               ))}
             </div>
             {fieldErrors.vehicleType && (
-              <p className="mt-1 text-xs text-red-500">{fieldErrors.vehicleType}</p>
+              <p className="mt-1 text-xs text-red-500">
+                {fieldErrors.vehicleType}
+              </p>
             )}
           </div>
 
           {/* Hãng xe + Model */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Hãng xe</label>
+              <label className="block text-xs text-gray-600 mb-1">
+                Hãng xe
+              </label>
               <input
                 className={`w-full h-[36px] border rounded px-3 text-sm focus:outline-none focus:border-blue-400 ${
-                  fieldErrors.brand ? "border-red-400 bg-red-50" : "border-gray-300"
+                  fieldErrors.brand
+                    ? "border-red-400 bg-red-50"
+                    : "border-gray-300"
                 }`}
                 placeholder="VD: Honda, Yamaha..."
                 value={form.brand}
@@ -208,7 +229,9 @@ function VehicleFormModal({
               <label className="block text-xs text-gray-600 mb-1">Model</label>
               <input
                 className={`w-full h-[36px] border rounded px-3 text-sm focus:outline-none focus:border-blue-400 ${
-                  fieldErrors.model ? "border-red-400 bg-red-50" : "border-gray-300"
+                  fieldErrors.model
+                    ? "border-red-400 bg-red-50"
+                    : "border-gray-300"
                 }`}
                 placeholder="VD: Wave, Vision..."
                 value={form.model}
@@ -225,7 +248,9 @@ function VehicleFormModal({
             <label className="block text-xs text-gray-600 mb-1">Màu xe</label>
             <input
               className={`w-full h-[36px] border rounded px-3 text-sm focus:outline-none focus:border-blue-400 ${
-                fieldErrors.color ? "border-red-400 bg-red-50" : "border-gray-300"
+                fieldErrors.color
+                  ? "border-red-400 bg-red-50"
+                  : "border-gray-300"
               }`}
               placeholder="VD: Đen, Trắng, Đỏ..."
               value={form.color}
@@ -244,7 +269,11 @@ function VehicleFormModal({
             disabled={loading}
             className="h-[34px] px-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium rounded transition-colors"
           >
-            {loading ? "Đang lưu..." : initial ? "Lưu thay đổi" : "Thêm phương tiện"}
+            {loading
+              ? "Đang lưu..."
+              : initial
+                ? "Lưu thay đổi"
+                : "Thêm phương tiện"}
           </button>
           <button
             onClick={onClose}
@@ -282,7 +311,9 @@ export default function UserMyVehicles() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const handleAdd = async (payload: VehicleRequest) => {
     await cardService.addVehicle(payload);
@@ -315,7 +346,9 @@ export default function UserMyVehicles() {
     <div className="p-6 max-w-2xl mx-auto">
       {/* Title bar */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-semibold text-gray-800">Phương tiện của tôi</h2>
+        <h2 className="text-base font-semibold text-gray-800">
+          Phương tiện của tôi
+        </h2>
         <button
           onClick={() => setShowAdd(true)}
           className="flex items-center gap-1.5 h-[34px] px-3 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
@@ -327,13 +360,21 @@ export default function UserMyVehicles() {
 
       {/* Content */}
       {loading ? (
-        <div className="text-sm text-gray-500 text-center py-10">Đang tải...</div>
+        <div className="text-sm text-gray-500 text-center py-10">
+          Đang tải...
+        </div>
       ) : error ? (
-        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-4 py-3">{error}</div>
+        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-4 py-3">
+          {error}
+        </div>
       ) : vehicles.length === 0 ? (
         <div className="text-sm text-gray-500 text-center py-10 border-2 border-dashed border-gray-200 rounded-lg">
-          Bạn chưa đăng ký phương tiện nào.<br />
-          <span className="text-blue-600 cursor-pointer hover:underline" onClick={() => setShowAdd(true)}>
+          Bạn chưa đăng ký phương tiện nào.
+          <br />
+          <span
+            className="text-blue-600 cursor-pointer hover:underline"
+            onClick={() => setShowAdd(true)}
+          >
             Thêm phương tiện ngay
           </span>
         </div>
@@ -347,7 +388,9 @@ export default function UserMyVehicles() {
               <div className="flex items-center gap-3">
                 <TypeIcon type={v.vehicleType} />
                 <div>
-                  <p className="text-sm font-semibold text-gray-800 tracking-wide">{v.plateNo}</p>
+                  <p className="text-sm font-semibold text-gray-800 tracking-wide">
+                    {v.plateNo}
+                  </p>
                   <p className="text-xs text-gray-500">
                     {typeLabel(v.vehicleType)}
                     {v.brand && ` · ${v.brand}`}
@@ -379,7 +422,10 @@ export default function UserMyVehicles() {
 
       {/* Modals */}
       {showAdd && (
-        <VehicleFormModal onSave={handleAdd} onClose={() => setShowAdd(false)} />
+        <VehicleFormModal
+          onSave={handleAdd}
+          onClose={() => setShowAdd(false)}
+        />
       )}
       {editTarget && (
         <VehicleFormModal
@@ -394,10 +440,15 @@ export default function UserMyVehicles() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[70]">
           <div className="bg-white rounded-lg shadow-xl w-[360px] p-6 text-center">
             <Trash2 className="w-10 h-10 text-red-500 mx-auto mb-3" />
-            <p className="text-sm font-semibold text-gray-800 mb-1">Xóa phương tiện?</p>
+            <p className="text-sm font-semibold text-gray-800 mb-1">
+              Xóa phương tiện?
+            </p>
             <p className="text-xs text-gray-500 mb-4">
               Bạn có chắc muốn xóa biển số{" "}
-              <span className="font-semibold text-gray-700">{deleteTarget.plateNo}</span> khỏi danh sách không?
+              <span className="font-semibold text-gray-700">
+                {deleteTarget.plateNo}
+              </span>{" "}
+              khỏi danh sách không?
             </p>
             <div className="flex gap-2 justify-center">
               <button

@@ -26,7 +26,7 @@ export async function safeJson<T>(response: Response): Promise<T> {
  */
 export async function authFetch(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<Response> {
   // Import lazily to avoid circular dependency
   const { authService } = await import("../services/authService");
@@ -84,7 +84,11 @@ export async function handleResponse<T>(response: Response): Promise<T> {
   }
 
   if (!response.ok) {
-    const errorMsg = data?.message || data?.error || response.statusText || "Có lỗi xảy ra khi kết nối máy chủ.";
+    const errorMsg =
+      data?.message ||
+      data?.error ||
+      response.statusText ||
+      "Có lỗi xảy ra khi kết nối máy chủ.";
     throw new Error(errorMsg);
   }
 

@@ -50,9 +50,7 @@ const initialProfile: Profile = {
 };
 
 // Chỉ dùng để demo frontend
-export default function UserDashboard({
-  userName,
-}: UserDashboardProps) {
+export default function UserDashboard({ userName }: UserDashboardProps) {
   const [profile, setProfile] = useState<Profile>(initialProfile);
   const [form, setForm] = useState<Profile>(initialProfile);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -71,8 +69,7 @@ export default function UserDashboard({
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmNewPassword, setShowConfirmNewPassword] =
-    useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [saved, setSaved] = useState(false);
@@ -96,7 +93,9 @@ export default function UserDashboard({
           email: data.email,
           soDienThoai: data.phone,
           diaChi: data.address || "",
-          ngayDangKy: data.createdAt ? new Date(data.createdAt).toLocaleDateString("vi-VN") : "15/03/2023",
+          ngayDangKy: data.createdAt
+            ? new Date(data.createdAt).toLocaleDateString("vi-VN")
+            : "15/03/2023",
         };
         setProfile(formattedProfile);
         setForm(formattedProfile);
@@ -207,7 +206,7 @@ export default function UserDashboard({
       setOldPasswordError("");
     } catch (error) {
       setOldPasswordError(
-        error instanceof Error ? error.message : "Mật khẩu cũ không chính xác."
+        error instanceof Error ? error.message : "Mật khẩu cũ không chính xác.",
       );
       setIsPasswordVerified(false);
     } finally {
@@ -238,9 +237,7 @@ export default function UserDashboard({
 
     if (!form.email.trim()) {
       newErrors.email = "Vui lòng nhập email.";
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())
-    ) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
       newErrors.email = "Email không đúng định dạng.";
     }
 
@@ -267,11 +264,9 @@ export default function UserDashboard({
       }
 
       if (!confirmNewPassword) {
-        newErrors.confirmPassword =
-          "Vui lòng xác nhận mật khẩu mới.";
+        newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu mới.";
       } else if (newPassword !== confirmNewPassword) {
-        newErrors.confirmPassword =
-          "Mật khẩu xác nhận không khớp.";
+        newErrors.confirmPassword = "Mật khẩu xác nhận không khớp.";
       }
     }
 
@@ -292,7 +287,7 @@ export default function UserDashboard({
         phone: form.soDienThoai,
         address: form.diaChi,
         newPassword: newPassword || undefined,
-        oldPassword: newPassword ? oldPassword : undefined
+        oldPassword: newPassword ? oldPassword : undefined,
       });
 
       const formattedProfile: Profile = {
@@ -300,7 +295,9 @@ export default function UserDashboard({
         email: updatedData.email,
         soDienThoai: updatedData.phone,
         diaChi: updatedData.address || "",
-        ngayDangKy: updatedData.createdAt ? new Date(updatedData.createdAt).toLocaleDateString("vi-VN") : "15/03/2023",
+        ngayDangKy: updatedData.createdAt
+          ? new Date(updatedData.createdAt).toLocaleDateString("vi-VN")
+          : "15/03/2023",
       };
 
       setProfile(formattedProfile);
@@ -317,14 +314,13 @@ export default function UserDashboard({
       }, 2500);
     } catch (error) {
       console.error(error);
-      alert(error instanceof Error ? error.message : "Không thể cập nhật hồ sơ.");
+      alert(
+        error instanceof Error ? error.message : "Không thể cập nhật hồ sơ.",
+      );
     }
   };
 
-  const updateProfileField = (
-    field: keyof Profile,
-    value: string
-  ) => {
+  const updateProfileField = (field: keyof Profile, value: string) => {
     setForm((previous) => ({
       ...previous,
       [field]: value,
@@ -435,18 +431,13 @@ export default function UserDashboard({
                 value: string;
               }[]
             ).map(({ icon: Icon, label, value }) => (
-              <div
-                key={label}
-                className="flex items-center gap-3 py-3"
-              >
+              <div key={label} className="flex items-center gap-3 py-3">
                 <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
                   <Icon className="w-4 h-4 text-blue-500" />
                 </div>
 
                 <div className="flex-1 flex justify-between items-center gap-4">
-                  <span className="text-xs text-gray-500">
-                    {label}
-                  </span>
+                  <span className="text-xs text-gray-500">{label}</span>
 
                   <span className="text-sm font-medium text-gray-800 text-right">
                     {value}
@@ -489,8 +480,8 @@ export default function UserDashboard({
                   </div>
 
                   <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                    Vui lòng nhập mật khẩu hiện tại trước khi chỉnh
-                    sửa thông tin hồ sơ.
+                    Vui lòng nhập mật khẩu hiện tại trước khi chỉnh sửa thông
+                    tin hồ sơ.
                   </p>
                 </div>
               </div>
@@ -508,9 +499,7 @@ export default function UserDashboard({
 
                 <input
                   id="current-password"
-                  type={
-                    showCurrentPassword ? "text" : "password"
-                  }
+                  type={showCurrentPassword ? "text" : "password"}
                   autoFocus
                   value={currentPassword}
                   onChange={(event) => {
@@ -553,8 +542,7 @@ export default function UserDashboard({
               )}
 
               <div className="mt-4 px-3 py-2.5 rounded bg-amber-50 border border-amber-200 text-xs text-amber-700">
-                Mật khẩu demo là{" "}
-                <span className="font-semibold">123456</span>.
+                Mật khẩu demo là <span className="font-semibold">123456</span>.
               </div>
             </div>
 
@@ -567,9 +555,7 @@ export default function UserDashboard({
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
 
-                {checkingPassword
-                  ? "Đang kiểm tra..."
-                  : "Xác nhận"}
+                {checkingPassword ? "Đang kiểm tra..." : "Xác nhận"}
               </button>
 
               <button
@@ -628,9 +614,7 @@ export default function UserDashboard({
                 />
 
                 {errors.hoTen && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.hoTen}
-                  </p>
+                  <p className="mt-1 text-xs text-red-600">{errors.hoTen}</p>
                 )}
               </div>
 
@@ -655,9 +639,7 @@ export default function UserDashboard({
                 />
 
                 {errors.email && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.email}
-                  </p>
+                  <p className="mt-1 text-xs text-red-600">{errors.email}</p>
                 )}
               </div>
 
@@ -671,10 +653,7 @@ export default function UserDashboard({
                   type="tel"
                   value={form.soDienThoai}
                   onChange={(event) =>
-                    updateProfileField(
-                      "soDienThoai",
-                      event.target.value
-                    )
+                    updateProfileField("soDienThoai", event.target.value)
                   }
                   className={`w-full h-[46px] border rounded-md px-4 text-base focus:outline-none focus:ring-1 ${
                     errors.soDienThoai
@@ -712,9 +691,7 @@ export default function UserDashboard({
                 />
 
                 {errors.diaChi && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.diaChi}
-                  </p>
+                  <p className="mt-1 text-xs text-red-600">{errors.diaChi}</p>
                 )}
               </div>
 
@@ -764,7 +741,11 @@ export default function UserDashboard({
                   <button
                     type="button"
                     onClick={handleVerifyOldPassword}
-                    disabled={isPasswordVerified || verifyingOldPassword || !oldPassword.trim()}
+                    disabled={
+                      isPasswordVerified ||
+                      verifyingOldPassword ||
+                      !oldPassword.trim()
+                    }
                     className={`h-[46px] px-4 font-medium rounded-md text-sm border flex items-center justify-center transition-colors ${
                       isPasswordVerified
                         ? "bg-emerald-50 text-emerald-600 border-emerald-200"
@@ -791,7 +772,8 @@ export default function UserDashboard({
                 {isPasswordVerified && (
                   <p className="mt-1 text-xs text-emerald-600 flex items-center gap-1">
                     <CheckCircle className="w-3.5 h-3.5" />
-                    Xác thực mật khẩu cũ thành công. Bạn có thể nhập mật khẩu mới.
+                    Xác thực mật khẩu cũ thành công. Bạn có thể nhập mật khẩu
+                    mới.
                   </p>
                 )}
               </div>
@@ -825,14 +807,16 @@ export default function UserDashboard({
                         ? "border-red-400 focus:border-red-400 focus:ring-red-100"
                         : "border-gray-300 focus:border-blue-400 focus:ring-blue-100"
                     } ${!isPasswordVerified ? "bg-gray-50 text-gray-400 cursor-not-allowed" : ""}`}
-                    placeholder={isPasswordVerified ? "Nhập mật khẩu mới..." : "Vui lòng xác minh mật khẩu cũ trước..."}
+                    placeholder={
+                      isPasswordVerified
+                        ? "Nhập mật khẩu mới..."
+                        : "Vui lòng xác minh mật khẩu cũ trước..."
+                    }
                   />
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowNewPassword((previous) => !previous)
-                    }
+                    onClick={() => setShowNewPassword((previous) => !previous)}
                     disabled={!isPasswordVerified}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
                   >
@@ -861,9 +845,7 @@ export default function UserDashboard({
 
                 <div className="relative">
                   <input
-                    type={
-                      showConfirmNewPassword ? "text" : "password"
-                    }
+                    type={showConfirmNewPassword ? "text" : "password"}
                     value={confirmNewPassword}
                     disabled={!isPasswordVerified}
                     onChange={(event) => {
@@ -884,15 +866,17 @@ export default function UserDashboard({
                         ? "border-red-400 focus:border-red-400 focus:ring-red-100"
                         : "border-gray-300 focus:border-blue-400 focus:ring-blue-100"
                     } ${!isPasswordVerified ? "bg-gray-50 text-gray-400 cursor-not-allowed" : ""}`}
-                    placeholder={isPasswordVerified ? "Nhập lại mật khẩu mới..." : "Vui lòng xác minh mật khẩu cũ trước..."}
+                    placeholder={
+                      isPasswordVerified
+                        ? "Nhập lại mật khẩu mới..."
+                        : "Vui lòng xác minh mật khẩu cũ trước..."
+                    }
                   />
 
                   <button
                     type="button"
                     onClick={() =>
-                      setShowConfirmNewPassword(
-                        (previous) => !previous
-                      )
+                      setShowConfirmNewPassword((previous) => !previous)
                     }
                     disabled={!isPasswordVerified}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"

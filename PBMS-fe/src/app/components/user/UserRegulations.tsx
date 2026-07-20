@@ -16,7 +16,10 @@ import {
   RefreshCw,
 } from "lucide-react";
 import violationRuleService from "../../../services/violationRuleService";
-import { adminCardService, CardGroupDto } from "../../../services/adminCardService";
+import {
+  adminCardService,
+  CardGroupDto,
+} from "../../../services/adminCardService";
 import { ViolationRule } from "../admin/CardViolationRules";
 
 /* ─── FAQ items ─────────────────────────────────────────── */
@@ -27,7 +30,7 @@ const FAQ = [
   },
   {
     q: "Tôi có thể gia hạn thẻ tháng không?",
-    a: "Có. Bạn vào mục \"Thẻ của tôi\" để gia hạn trước ngày hết hạn. Nếu đã hết hạn mà vẫn đỗ xe, hệ thống sẽ tính phí phạt theo giờ quá hạn.",
+    a: 'Có. Bạn vào mục "Thẻ của tôi" để gia hạn trước ngày hết hạn. Nếu đã hết hạn mà vẫn đỗ xe, hệ thống sẽ tính phí phạt theo giờ quá hạn.',
   },
   {
     q: "Phí phạt được tính từ thời điểm nào?",
@@ -35,7 +38,7 @@ const FAQ = [
   },
   {
     q: "Tôi muốn khiếu nại vi phạm thì làm thế nào?",
-    a: "Vào mục \"Hỗ trợ\" để gửi yêu cầu khiếu nại. Nhân viên sẽ xem xét và phản hồi trong vòng 24 giờ làm việc.",
+    a: 'Vào mục "Hỗ trợ" để gửi yêu cầu khiếu nại. Nhân viên sẽ xem xét và phản hồi trong vòng 24 giờ làm việc.',
   },
 ];
 
@@ -48,21 +51,48 @@ const TICKET_GROUP_LABEL: Record<TicketGroup, string> = {
   MONTHLY: "Thẻ tháng",
 };
 
-const TICKET_GROUP_COLOR: Record<TicketGroup, { bg: string; border: string; icon: string; text: string; badge: string }> = {
-  SINGLE:  { bg: "bg-amber-50",  border: "border-amber-200",  icon: "text-amber-500",  text: "text-amber-700",  badge: "bg-amber-100 text-amber-800"  },
-  DAY:     { bg: "bg-blue-50",   border: "border-blue-200",   icon: "text-blue-500",   text: "text-blue-700",   badge: "bg-blue-100 text-blue-800"     },
-  MONTHLY: { bg: "bg-purple-50", border: "border-purple-200", icon: "text-purple-500", text: "text-purple-700", badge: "bg-purple-100 text-purple-800"  },
+const TICKET_GROUP_COLOR: Record<
+  TicketGroup,
+  { bg: string; border: string; icon: string; text: string; badge: string }
+> = {
+  SINGLE: {
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    icon: "text-amber-500",
+    text: "text-amber-700",
+    badge: "bg-amber-100 text-amber-800",
+  },
+  DAY: {
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    icon: "text-blue-500",
+    text: "text-blue-700",
+    badge: "bg-blue-100 text-blue-800",
+  },
+  MONTHLY: {
+    bg: "bg-purple-50",
+    border: "border-purple-200",
+    icon: "text-purple-500",
+    text: "text-purple-700",
+    badge: "bg-purple-100 text-purple-800",
+  },
 };
 
 const TICKET_ICONS: Record<TicketGroup, React.FC<{ className?: string }>> = {
-  SINGLE:  Tag,
-  DAY:     CalendarDays,
+  SINGLE: Tag,
+  DAY: CalendarDays,
   MONTHLY: CreditCardSvg,
 };
 
 function CreditCardSvg({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
       <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
       <line x1="1" y1="10" x2="23" y2="10" />
     </svg>
@@ -80,24 +110,27 @@ export default function UserRegulations() {
     Promise.all([
       adminCardService.getAllCardGroups().catch(() => [] as CardGroupDto[]),
       violationRuleService.getAllRules().catch(() => [] as ViolationRule[]),
-    ]).then(([g, r]) => {
-      setGroups(g.filter((x) => x.status === "ACTIVE"));
-      setRules(r.filter((x) => x.isActive));
-    }).finally(() => setLoading(false));
+    ])
+      .then(([g, r]) => {
+        setGroups(g.filter((x) => x.status === "ACTIVE"));
+        setRules(r.filter((x) => x.isActive));
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   /* Nhóm card-groups theo ticketType */
-  const groupedPrices = (["SINGLE", "DAY", "MONTHLY"] as TicketGroup[]).map((type) => ({
-    type,
-    items: groups.filter((g) => g.ticketType === type),
-  })).filter((g) => g.items.length > 0);
+  const groupedPrices = (["SINGLE", "DAY", "MONTHLY"] as TicketGroup[])
+    .map((type) => ({
+      type,
+      items: groups.filter((g) => g.ticketType === type),
+    }))
+    .filter((g) => g.items.length > 0);
 
-  const singleRules  = rules.filter((r) => r.ticketType === "SINGLE");
+  const singleRules = rules.filter((r) => r.ticketType === "SINGLE");
   const expiredRules = rules.filter((r) => r.ticketType !== "SINGLE");
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
-
       {/* ── Hero giới thiệu ── */}
       <section className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a3560] via-[#1e4080] to-[#0e6ba8] p-8 text-white shadow-xl">
         <div
@@ -121,15 +154,16 @@ export default function UserRegulations() {
               Hệ thống Quản lý Bãi xe <span className="text-sky-300">PBMS</span>
             </h1>
             <p className="text-blue-100 text-sm leading-relaxed max-w-2xl">
-              PBMS là hệ thống quản lý bãi đỗ xe thông minh, hỗ trợ các loại thẻ lượt, thẻ ngày và thẻ tháng cho xe
-              máy và ô tô. Hệ thống tự động ghi nhận thời gian check-in / check-out, tính phí và xử lý vi phạm minh
-              bạch, nhanh chóng.
+              PBMS là hệ thống quản lý bãi đỗ xe thông minh, hỗ trợ các loại thẻ
+              lượt, thẻ ngày và thẻ tháng cho xe máy và ô tô. Hệ thống tự động
+              ghi nhận thời gian check-in / check-out, tính phí và xử lý vi phạm
+              minh bạch, nhanh chóng.
             </p>
             <div className="flex flex-wrap gap-3 mt-4">
               {[
                 { icon: CheckCircle2, label: "Quản lý thẻ thông minh" },
-                { icon: Clock,        label: "Tự động tính giờ" },
-                { icon: ShieldAlert,  label: "Xử lý vi phạm minh bạch" },
+                { icon: Clock, label: "Tự động tính giờ" },
+                { icon: ShieldAlert, label: "Xử lý vi phạm minh bạch" },
               ].map(({ icon: Icon, label }) => (
                 <div
                   key={label}
@@ -164,22 +198,32 @@ export default function UserRegulations() {
               const c = TICKET_GROUP_COLOR[type];
               const Icon = TICKET_ICONS[type];
               return (
-                <div key={type} className={`rounded-xl border ${c.border} ${c.bg} p-4 shadow-sm`}>
+                <div
+                  key={type}
+                  className={`rounded-xl border ${c.border} ${c.bg} p-4 shadow-sm`}
+                >
                   <div className="flex items-center gap-2 mb-3">
                     <div className="p-1.5 rounded-lg bg-white shadow-sm">
                       <Icon className={`w-4 h-4 ${c.icon}`} />
                     </div>
-                    <span className={`text-xs font-bold uppercase tracking-wide ${c.text}`}>
+                    <span
+                      className={`text-xs font-bold uppercase tracking-wide ${c.text}`}
+                    >
                       {TICKET_GROUP_LABEL[type]}
                     </span>
                   </div>
                   <div className="space-y-2">
                     {items.map((g) => (
-                      <div key={g.cardGroupId} className="flex justify-between items-center gap-2">
+                      <div
+                        key={g.cardGroupId}
+                        className="flex justify-between items-center gap-2"
+                      >
                         <span className="text-xs text-gray-600 flex items-center gap-1">
-                          {g.vehicleType === "MOTORCYCLE"
-                            ? <Bike className="w-3 h-3 text-gray-400" />
-                            : <Car className="w-3 h-3 text-gray-400" />}
+                          {g.vehicleType === "MOTORCYCLE" ? (
+                            <Bike className="w-3 h-3 text-gray-400" />
+                          ) : (
+                            <Car className="w-3 h-3 text-gray-400" />
+                          )}
                           {g.groupName}
                         </span>
                         <span className="text-sm font-bold text-gray-800 whitespace-nowrap">
@@ -195,7 +239,8 @@ export default function UserRegulations() {
         )}
 
         <p className="text-[11px] text-gray-400 mt-2 flex items-center gap-1">
-          <Info className="w-3 h-3" /> Giá vé phản ánh cấu hình hiện tại của hệ thống, có thể thay đổi theo thông báo của ban quản lý.
+          <Info className="w-3 h-3" /> Giá vé phản ánh cấu hình hiện tại của hệ
+          thống, có thể thay đổi theo thông báo của ban quản lý.
         </p>
       </section>
 
@@ -217,17 +262,22 @@ export default function UserRegulations() {
                   <Tag className="w-3 h-3" /> Thẻ lượt – Quá giờ đỗ
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {singleRules.map((r) => <RuleCard key={r.id} rule={r} />)}
+                  {singleRules.map((r) => (
+                    <RuleCard key={r.id} rule={r} />
+                  ))}
                 </div>
               </div>
             )}
             {expiredRules.length > 0 && (
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-red-500 mb-2 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" /> Thẻ ngày / tháng – Hết hạn khi checkout
+                  <AlertTriangle className="w-3 h-3" /> Thẻ ngày / tháng – Hết
+                  hạn khi checkout
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {expiredRules.map((r) => <RuleCard key={r.id} rule={r} />)}
+                  {expiredRules.map((r) => (
+                    <RuleCard key={r.id} rule={r} />
+                  ))}
                 </div>
               </div>
             )}
@@ -245,12 +295,25 @@ export default function UserRegulations() {
         <div className="flex gap-3">
           <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-bold text-blue-800 mb-1.5">Lưu ý chung</p>
+            <p className="text-sm font-bold text-blue-800 mb-1.5">
+              Lưu ý chung
+            </p>
             <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside leading-relaxed">
-              <li>Phí phạt được tính tự động và ghi nhận vào hồ sơ vi phạm của tài khoản.</li>
-              <li>Khách hàng có thể khiếu nại vi phạm trong vòng <strong>7 ngày</strong> kể từ ngày phát sinh.</li>
-              <li>Xe không xuất trình thẻ hợp lệ khi ra sẽ bị giữ lại để xác minh.</li>
-              <li>Mọi thắc mắc vui lòng liên hệ qua mục <strong>Hỗ trợ</strong> trong ứng dụng.</li>
+              <li>
+                Phí phạt được tính tự động và ghi nhận vào hồ sơ vi phạm của tài
+                khoản.
+              </li>
+              <li>
+                Khách hàng có thể khiếu nại vi phạm trong vòng{" "}
+                <strong>7 ngày</strong> kể từ ngày phát sinh.
+              </li>
+              <li>
+                Xe không xuất trình thẻ hợp lệ khi ra sẽ bị giữ lại để xác minh.
+              </li>
+              <li>
+                Mọi thắc mắc vui lòng liên hệ qua mục <strong>Hỗ trợ</strong>{" "}
+                trong ứng dụng.
+              </li>
             </ul>
           </div>
         </div>
@@ -258,18 +321,29 @@ export default function UserRegulations() {
 
       {/* ── FAQ ── */}
       <section>
-        <SectionTitle icon={Info} title="Câu hỏi thường gặp" subtitle="Giải đáp các thắc mắc phổ biến" />
+        <SectionTitle
+          icon={Info}
+          title="Câu hỏi thường gặp"
+          subtitle="Giải đáp các thắc mắc phổ biến"
+        />
         <div className="mt-4 space-y-2">
           {FAQ.map((item, idx) => (
-            <div key={idx} className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+            <div
+              key={idx}
+              className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm"
+            >
               <button
                 onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
                 className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
               >
-                <span className="text-sm font-semibold text-gray-800">{item.q}</span>
-                {openFaq === idx
-                  ? <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
+                <span className="text-sm font-semibold text-gray-800">
+                  {item.q}
+                </span>
+                {openFaq === idx ? (
+                  <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                )}
               </button>
               {openFaq === idx && (
                 <div className="px-4 pb-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-2">
@@ -318,20 +392,28 @@ function LoadingSpinner({ label }: { label: string }) {
 }
 
 function RuleCard({ rule }: { rule: ViolationRule }) {
-  const isMoto   = rule.vehicleType === "MOTORCYCLE";
-  const isSingle = rule.ticketType  === "SINGLE";
+  const isMoto = rule.vehicleType === "MOTORCYCLE";
+  const isSingle = rule.ticketType === "SINGLE";
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:border-red-200 hover:shadow-md transition-all">
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-lg flex-shrink-0 ${isMoto ? "bg-blue-50" : "bg-indigo-50"}`}>
-          {isMoto
-            ? <Bike className="w-4 h-4 text-blue-600" />
-            : <Car  className="w-4 h-4 text-indigo-600" />}
+        <div
+          className={`p-2 rounded-lg flex-shrink-0 ${isMoto ? "bg-blue-50" : "bg-indigo-50"}`}
+        >
+          {isMoto ? (
+            <Bike className="w-4 h-4 text-blue-600" />
+          ) : (
+            <Car className="w-4 h-4 text-indigo-600" />
+          )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-gray-800 leading-tight">{rule.ruleName}</p>
-          <p className="text-xs text-gray-500 mt-1 leading-relaxed">{rule.description}</p>
+          <p className="text-sm font-bold text-gray-800 leading-tight">
+            {rule.ruleName}
+          </p>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+            {rule.description}
+          </p>
           <div className="flex flex-wrap gap-2 mt-2.5">
             {isSingle && (
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5">

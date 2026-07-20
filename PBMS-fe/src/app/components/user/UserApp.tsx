@@ -36,7 +36,12 @@ function renderScreen(screen: UserScreen, userName: string) {
 export default function UserApp({ userName, onLogout }: UserAppProps) {
   const [screen, setScreen] = useState<UserScreen>("dashboard");
   return (
-    <UserLayout currentScreen={screen} onNavigate={setScreen} onLogout={onLogout} userName={userName}>
+    <UserLayout
+      currentScreen={screen}
+      onNavigate={setScreen}
+      onLogout={onLogout}
+      userName={userName}
+    >
       {renderScreen(screen, userName)}
     </UserLayout>
   );
