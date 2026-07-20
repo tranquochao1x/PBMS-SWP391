@@ -140,7 +140,9 @@ export default function PaymentModal({
         pollRef.current = setInterval(async () => {
           pollCount++;
           try {
-            const status = await apiFetch(`/staff/payment-status/${parkingSessionId}`);
+            const status = await apiFetch(
+              `/staff/payment-status/${parkingSessionId}`,
+            );
             if (status === "PAID") {
               clearTimers();
               setStep("success");
@@ -150,7 +152,9 @@ export default function PaymentModal({
               setStep("failed");
             } else if (pollCount >= MAX_POLLS) {
               clearTimers();
-              setErrorMsg("Hết thời gian chờ thanh toán (2 phút). Vui lòng thử lại.");
+              setErrorMsg(
+                "Hết thời gian chờ thanh toán (2 phút). Vui lòng thử lại.",
+              );
               setStep("failed");
             }
           } catch {
@@ -173,7 +177,9 @@ export default function PaymentModal({
   const TicketInfo = () => (
     <div className="grid grid-cols-2 gap-y-1.5 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-[12px]">
       <span className="text-gray-500">Mã vé:</span>
-      <span className="text-right font-bold text-gray-800">{parkingSessionNo}</span>
+      <span className="text-right font-bold text-gray-800">
+        {parkingSessionNo}
+      </span>
       <span className="text-gray-500">Biển số xe:</span>
       <span className="text-right font-bold text-gray-800">{plateNo}</span>
       <span className="text-gray-500">Loại xe:</span>
@@ -181,9 +187,13 @@ export default function PaymentModal({
         {vehicleType === "CAR" ? "Ô tô" : "Xe máy"}
       </span>
       <span className="text-gray-500">Giờ vào:</span>
-      <span className="text-right font-medium text-gray-700">{checkInFormatted}</span>
+      <span className="text-right font-medium text-gray-700">
+        {checkInFormatted}
+      </span>
       <span className="text-gray-500">Giờ ra:</span>
-      <span className="text-right font-medium text-gray-700">{checkOutFormatted}</span>
+      <span className="text-right font-medium text-gray-700">
+        {checkOutFormatted}
+      </span>
     </div>
   );
 
@@ -208,7 +218,11 @@ export default function PaymentModal({
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div
           className={`flex items-center justify-between px-5 py-3.5 ${
-            step === "success" ? "bg-green-600" : step === "failed" ? "bg-red-500" : "bg-blue-600"
+            step === "success"
+              ? "bg-green-600"
+              : step === "failed"
+                ? "bg-red-500"
+                : "bg-blue-600"
           }`}
         >
           <div className="flex items-center gap-2">
@@ -223,16 +237,19 @@ export default function PaymentModal({
               {step === "success"
                 ? "Thanh toán thành công!"
                 : step === "failed"
-                ? "Giao dịch thất bại"
-                : step === "vnpay_qr"
-                ? "Quét mã VNPay"
-                : "Xác nhận thanh toán"}
+                  ? "Giao dịch thất bại"
+                  : step === "vnpay_qr"
+                    ? "Quét mã VNPay"
+                    : "Xác nhận thanh toán"}
             </span>
           </div>
           {step !== "processing" && (
             <button
               type="button"
-              onClick={() => { clearTimers(); onClose(); }}
+              onClick={() => {
+                clearTimers();
+                onClose();
+              }}
               className="rounded-full p-1 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
               aria-label="Đóng"
             >
@@ -243,7 +260,6 @@ export default function PaymentModal({
 
         {/* ── Body ───────────────────────────────────────────────────────── */}
         <div className="space-y-4 px-5 py-4">
-
           {/* STEP: SELECT METHOD */}
           {step === "select" && (
             <>
@@ -297,7 +313,9 @@ export default function PaymentModal({
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
-                {method === "CASH" ? "✅ Xác nhận đã thu tiền mặt" : "📱 Tạo mã QR VNPay"}
+                {method === "CASH"
+                  ? "✅ Xác nhận đã thu tiền mặt"
+                  : "📱 Tạo mã QR VNPay"}
               </button>
             </>
           )}
@@ -323,7 +341,9 @@ export default function PaymentModal({
                   Quét mã QR bằng App ngân hàng / ví điện tử để thanh toán
                 </p>
                 <button
-                  onClick={() => { window.open(vnpayUrl, "_blank"); }}
+                  onClick={() => {
+                    window.open(vnpayUrl, "_blank");
+                  }}
                   className="text-xs text-blue-600 underline hover:text-blue-800"
                 >
                   Hoặc mở trang VNPay
@@ -365,7 +385,10 @@ export default function PaymentModal({
               )}
               <p className="mt-2 text-xs text-gray-400">
                 Tự động đóng sau{" "}
-                <span className="font-semibold text-gray-600">{closeCountdown}</span> giây...
+                <span className="font-semibold text-gray-600">
+                  {closeCountdown}
+                </span>{" "}
+                giây...
               </p>
             </div>
           )}
@@ -376,10 +399,15 @@ export default function PaymentModal({
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
                 <AlertCircle className="h-12 w-12 text-red-500" />
               </div>
-              <h2 className="text-xl font-bold text-red-700">Giao dịch thất bại</h2>
+              <h2 className="text-xl font-bold text-red-700">
+                Giao dịch thất bại
+              </h2>
               <p className="text-sm text-gray-500">{errorMsg}</p>
               <button
-                onClick={() => { setStep("select"); setErrorMsg(null); }}
+                onClick={() => {
+                  setStep("select");
+                  setErrorMsg(null);
+                }}
                 className="mt-2 rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white hover:bg-blue-700"
               >
                 Thử lại

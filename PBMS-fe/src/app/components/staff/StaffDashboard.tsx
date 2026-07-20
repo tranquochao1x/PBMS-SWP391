@@ -42,9 +42,7 @@ interface FormErrors {
   confirmPassword?: string;
 }
 
-export default function StaffDashboard({
-  staffName,
-}: StaffDashboardProps) {
+export default function StaffDashboard({ staffName }: StaffDashboardProps) {
   const createInitialProfile = (): StaffProfile => ({
     hoTen: staffName,
     maNhanVien: "NV-001",
@@ -55,13 +53,9 @@ export default function StaffDashboard({
     vaiTro: "Parking Staff",
   });
 
-  const [profile, setProfile] = useState<StaffProfile>(
-    createInitialProfile
-  );
+  const [profile, setProfile] = useState<StaffProfile>(createInitialProfile);
 
-  const [form, setForm] = useState<StaffProfile>(
-    createInitialProfile
-  );
+  const [form, setForm] = useState<StaffProfile>(createInitialProfile);
 
   const [loadingProfile, setLoadingProfile] = useState(true);
 
@@ -69,34 +63,26 @@ export default function StaffDashboard({
   const [now, setNow] = useState(new Date());
 
   // Modal xác nhận mật khẩu
-  const [
-    showPasswordConfirmation,
-    setShowPasswordConfirmation,
-  ] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] =
+    useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
-  const [showCurrentPassword, setShowCurrentPassword] =
-    useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 
-  const [currentPasswordError, setCurrentPasswordError] =
-    useState("");
+  const [currentPasswordError, setCurrentPasswordError] = useState("");
 
-  const [checkingPassword, setCheckingPassword] =
-    useState(false);
+  const [checkingPassword, setCheckingPassword] = useState(false);
 
   // Modal chỉnh sửa hồ sơ
   const [showEdit, setShowEdit] = useState(false);
 
   // Đổi mật khẩu
   const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] =
-    useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
-  const [showNewPassword, setShowNewPassword] =
-    useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const [showConfirmNewPassword, setShowConfirmNewPassword] =
-    useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   // Lỗi dữ liệu
   const [errors, setErrors] = useState<FormErrors>({});
@@ -120,7 +106,9 @@ export default function StaffDashboard({
           maNhanVien: data.staffCode || "NV-001",
           email: data.email,
           soDienThoai: data.phone,
-          ngayVaoLam: data.createdAt ? new Date(data.createdAt).toLocaleDateString("vi-VN") : "01/03/2023",
+          ngayVaoLam: data.createdAt
+            ? new Date(data.createdAt).toLocaleDateString("vi-VN")
+            : "01/03/2023",
           caLamViec: data.shift || "chưa được phân công",
           vaiTro: data.role || "Parking Staff",
         };
@@ -198,9 +186,7 @@ export default function StaffDashboard({
 
   const handleConfirmCurrentPassword = async () => {
     if (!currentPassword.trim()) {
-      setCurrentPasswordError(
-        "Vui lòng nhập mật khẩu hiện tại."
-      );
+      setCurrentPasswordError("Vui lòng nhập mật khẩu hiện tại.");
       return;
     }
 
@@ -216,9 +202,7 @@ export default function StaffDashboard({
       openEditForm();
     } catch (error) {
       setCurrentPasswordError(
-        error instanceof Error
-          ? error.message
-          : "Mật khẩu không chính xác."
+        error instanceof Error ? error.message : "Mật khẩu không chính xác.",
       );
     } finally {
       setCheckingPassword(false);
@@ -240,7 +224,7 @@ export default function StaffDashboard({
       setOldPasswordError("");
     } catch (error) {
       setOldPasswordError(
-        error instanceof Error ? error.message : "Mật khẩu cũ không chính xác."
+        error instanceof Error ? error.message : "Mật khẩu cũ không chính xác.",
       );
       setIsPasswordVerified(false);
     } finally {
@@ -271,49 +255,34 @@ export default function StaffDashboard({
 
     if (!form.email.trim()) {
       newErrors.email = "Vui lòng nhập email.";
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        form.email.trim()
-      )
-    ) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
       newErrors.email = "Email không đúng định dạng.";
     }
 
     if (!form.soDienThoai.trim()) {
-      newErrors.soDienThoai =
-        "Vui lòng nhập số điện thoại.";
+      newErrors.soDienThoai = "Vui lòng nhập số điện thoại.";
     } else {
-      const normalizedPhone = form.soDienThoai.replace(
-        /\s/g,
-        ""
-      );
+      const normalizedPhone = form.soDienThoai.replace(/\s/g, "");
 
       if (!/^(0|\+84)[0-9]{9,10}$/.test(normalizedPhone)) {
-        newErrors.soDienThoai =
-          "Số điện thoại không hợp lệ.";
+        newErrors.soDienThoai = "Số điện thoại không hợp lệ.";
       }
     }
 
-
-
     if (newPassword || confirmNewPassword) {
       if (!newPassword) {
-        newErrors.newPassword =
-          "Vui lòng nhập mật khẩu mới.";
+        newErrors.newPassword = "Vui lòng nhập mật khẩu mới.";
       } else if (newPassword.length < 6) {
-        newErrors.newPassword =
-          "Mật khẩu phải có ít nhất 6 ký tự.";
+        newErrors.newPassword = "Mật khẩu phải có ít nhất 6 ký tự.";
       } else if (newPassword === currentPassword) {
         newErrors.newPassword =
           "Mật khẩu mới không được giống mật khẩu hiện tại.";
       }
 
       if (!confirmNewPassword) {
-        newErrors.confirmPassword =
-          "Vui lòng xác nhận mật khẩu mới.";
+        newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu mới.";
       } else if (newPassword !== confirmNewPassword) {
-        newErrors.confirmPassword =
-          "Mật khẩu xác nhận không khớp.";
+        newErrors.confirmPassword = "Mật khẩu xác nhận không khớp.";
       }
     }
 
@@ -333,7 +302,7 @@ export default function StaffDashboard({
         email: form.email,
         phone: form.soDienThoai,
         newPassword: newPassword || undefined,
-        oldPassword: newPassword ? oldPassword : undefined
+        oldPassword: newPassword ? oldPassword : undefined,
       });
 
       const formattedProfile: StaffProfile = {
@@ -341,7 +310,9 @@ export default function StaffDashboard({
         maNhanVien: updatedData.staffCode || "NV-001",
         email: updatedData.email,
         soDienThoai: updatedData.phone,
-        ngayVaoLam: updatedData.createdAt ? new Date(updatedData.createdAt).toLocaleDateString("vi-VN") : "01/03/2023",
+        ngayVaoLam: updatedData.createdAt
+          ? new Date(updatedData.createdAt).toLocaleDateString("vi-VN")
+          : "01/03/2023",
         caLamViec: updatedData.shift || "chưa được phân công",
         vaiTro: updatedData.role || "Parking Staff",
       };
@@ -360,24 +331,19 @@ export default function StaffDashboard({
       }, 2500);
     } catch (error) {
       console.error(error);
-      alert(error instanceof Error ? error.message : "Không thể cập nhật hồ sơ.");
+      alert(
+        error instanceof Error ? error.message : "Không thể cập nhật hồ sơ.",
+      );
     }
   };
 
-  const updateProfileField = (
-    field: keyof StaffProfile,
-    value: string
-  ) => {
+  const updateProfileField = (field: keyof StaffProfile, value: string) => {
     setForm((previous) => ({
       ...previous,
       [field]: value,
     }));
 
-    if (
-      field === "hoTen" ||
-      field === "email" ||
-      field === "soDienThoai"
-    ) {
+    if (field === "hoTen" || field === "email" || field === "soDienThoai") {
       setErrors((previous) => ({
         ...previous,
         [field]: undefined,
@@ -491,28 +457,21 @@ export default function StaffDashboard({
           )}
 
           <div className="divide-y divide-gray-100">
-            {profileRows.map(
-              ({ icon: Icon, label, value }) => (
-                <div
-                  key={label}
-                  className="flex items-center gap-3 py-3"
-                >
-                  <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-4 h-4 text-blue-500" />
-                  </div>
-
-                  <div className="flex-1 flex justify-between items-center gap-4">
-                    <span className="text-xs text-gray-500">
-                      {label}
-                    </span>
-
-                    <span className="text-sm font-medium text-gray-800 text-right">
-                      {value}
-                    </span>
-                  </div>
+            {profileRows.map(({ icon: Icon, label, value }) => (
+              <div key={label} className="flex items-center gap-3 py-3">
+                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-4 h-4 text-blue-500" />
                 </div>
-              )
-            )}
+
+                <div className="flex-1 flex justify-between items-center gap-4">
+                  <span className="text-xs text-gray-500">{label}</span>
+
+                  <span className="text-sm font-medium text-gray-800 text-right">
+                    {value}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -548,8 +507,8 @@ export default function StaffDashboard({
                   </div>
 
                   <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                    Vui lòng nhập mật khẩu hiện tại trước khi
-                    chỉnh sửa thông tin hồ sơ.
+                    Vui lòng nhập mật khẩu hiện tại trước khi chỉnh sửa thông
+                    tin hồ sơ.
                   </p>
                 </div>
               </div>
@@ -567,9 +526,7 @@ export default function StaffDashboard({
 
                 <input
                   id="staff-current-password"
-                  type={
-                    showCurrentPassword ? "text" : "password"
-                  }
+                  type={showCurrentPassword ? "text" : "password"}
                   autoFocus
                   value={currentPassword}
                   onChange={(event) => {
@@ -592,9 +549,7 @@ export default function StaffDashboard({
                 <button
                   type="button"
                   onClick={() =>
-                    setShowCurrentPassword(
-                      (previous) => !previous
-                    )
+                    setShowCurrentPassword((previous) => !previous)
                   }
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
@@ -614,8 +569,7 @@ export default function StaffDashboard({
               )}
 
               <div className="mt-4 px-3 py-2.5 rounded bg-amber-50 border border-amber-200 text-xs text-amber-700">
-                Mật khẩu demo là{" "}
-                <span className="font-semibold">123456</span>.
+                Mật khẩu demo là <span className="font-semibold">123456</span>.
               </div>
             </div>
 
@@ -630,9 +584,7 @@ export default function StaffDashboard({
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
 
-                {checkingPassword
-                  ? "Đang kiểm tra..."
-                  : "Xác nhận"}
+                {checkingPassword ? "Đang kiểm tra..." : "Xác nhận"}
               </button>
 
               <button
@@ -683,10 +635,7 @@ export default function StaffDashboard({
                   type="text"
                   value={form.hoTen}
                   onChange={(event) =>
-                    updateProfileField(
-                      "hoTen",
-                      event.target.value
-                    )
+                    updateProfileField("hoTen", event.target.value)
                   }
                   className={`w-full h-[46px] border rounded-md px-4 text-base focus:outline-none focus:ring-1 ${
                     errors.hoTen
@@ -741,10 +690,7 @@ export default function StaffDashboard({
                   type="email"
                   value={form.email}
                   onChange={(event) =>
-                    updateProfileField(
-                      "email",
-                      event.target.value
-                    )
+                    updateProfileField("email", event.target.value)
                   }
                   className={`w-full h-[46px] border rounded-md px-4 text-base focus:outline-none focus:ring-1 ${
                     errors.email
@@ -777,10 +723,7 @@ export default function StaffDashboard({
                   type="tel"
                   value={form.soDienThoai}
                   onChange={(event) =>
-                    updateProfileField(
-                      "soDienThoai",
-                      event.target.value
-                    )
+                    updateProfileField("soDienThoai", event.target.value)
                   }
                   className={`w-full h-[46px] border rounded-md px-4 text-base focus:outline-none focus:ring-1 ${
                     errors.soDienThoai
@@ -797,7 +740,6 @@ export default function StaffDashboard({
                   </p>
                 )}
               </div>
-
 
               {/* Ca làm việc */}
               <div>
@@ -893,7 +835,11 @@ export default function StaffDashboard({
                   <button
                     type="button"
                     onClick={handleVerifyOldPassword}
-                    disabled={isPasswordVerified || verifyingOldPassword || !oldPassword.trim()}
+                    disabled={
+                      isPasswordVerified ||
+                      verifyingOldPassword ||
+                      !oldPassword.trim()
+                    }
                     className={`h-[46px] px-4 font-medium rounded-md text-sm border flex items-center justify-center transition-colors ${
                       isPasswordVerified
                         ? "bg-emerald-50 text-emerald-600 border-emerald-200"
@@ -920,7 +866,8 @@ export default function StaffDashboard({
                 {isPasswordVerified && (
                   <p className="mt-1 text-xs text-emerald-600 flex items-center gap-1">
                     <CheckCircle className="w-3.5 h-3.5" />
-                    Xác thực mật khẩu cũ thành công. Bạn có thể nhập mật khẩu mới.
+                    Xác thực mật khẩu cũ thành công. Bạn có thể nhập mật khẩu
+                    mới.
                   </p>
                 )}
               </div>
@@ -941,9 +888,7 @@ export default function StaffDashboard({
                 <div className="relative">
                   <input
                     id="staff-new-password"
-                    type={
-                      showNewPassword ? "text" : "password"
-                    }
+                    type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     disabled={!isPasswordVerified}
                     onChange={(event) => {
@@ -960,16 +905,16 @@ export default function StaffDashboard({
                         ? "border-red-400 focus:border-red-400 focus:ring-red-100"
                         : "border-gray-300 focus:border-blue-400 focus:ring-blue-100"
                     } ${!isPasswordVerified ? "bg-gray-50 text-gray-400 cursor-not-allowed" : ""}`}
-                    placeholder={isPasswordVerified ? "Nhập mật khẩu mới..." : "Vui lòng xác minh mật khẩu cũ trước..."}
+                    placeholder={
+                      isPasswordVerified
+                        ? "Nhập mật khẩu mới..."
+                        : "Vui lòng xác minh mật khẩu cũ trước..."
+                    }
                   />
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowNewPassword(
-                        (previous) => !previous
-                      )
-                    }
+                    onClick={() => setShowNewPassword((previous) => !previous)}
                     disabled={!isPasswordVerified}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
                   >
@@ -1002,17 +947,11 @@ export default function StaffDashboard({
                 <div className="relative">
                   <input
                     id="staff-confirm-password"
-                    type={
-                      showConfirmNewPassword
-                        ? "text"
-                        : "password"
-                    }
+                    type={showConfirmNewPassword ? "text" : "password"}
                     value={confirmNewPassword}
                     disabled={!isPasswordVerified}
                     onChange={(event) => {
-                      setConfirmNewPassword(
-                        event.target.value
-                      );
+                      setConfirmNewPassword(event.target.value);
 
                       setErrors((previous) => ({
                         ...previous,
@@ -1029,15 +968,17 @@ export default function StaffDashboard({
                         ? "border-red-400 focus:border-red-400 focus:ring-red-100"
                         : "border-gray-300 focus:border-blue-400 focus:ring-blue-100"
                     } ${!isPasswordVerified ? "bg-gray-50 text-gray-400 cursor-not-allowed" : ""}`}
-                    placeholder={isPasswordVerified ? "Nhập lại mật khẩu mới..." : "Vui lòng xác minh mật khẩu cũ trước..."}
+                    placeholder={
+                      isPasswordVerified
+                        ? "Nhập lại mật khẩu mới..."
+                        : "Vui lòng xác minh mật khẩu cũ trước..."
+                    }
                   />
 
                   <button
                     type="button"
                     onClick={() =>
-                      setShowConfirmNewPassword(
-                        (previous) => !previous
-                      )
+                      setShowConfirmNewPassword((previous) => !previous)
                     }
                     disabled={!isPasswordVerified}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"

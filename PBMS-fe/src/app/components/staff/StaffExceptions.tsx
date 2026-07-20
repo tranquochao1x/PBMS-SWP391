@@ -11,7 +11,10 @@ import {
   Eye,
   X,
 } from "lucide-react";
-import { adminCardService, RequestSupportDto } from "../../../services/adminCardService";
+import {
+  adminCardService,
+  RequestSupportDto,
+} from "../../../services/adminCardService";
 
 interface SupportForm {
   subject: string;
@@ -67,25 +70,37 @@ const contactItems = [
 
 const mapStatusToVi = (status: string) => {
   switch (status) {
-    case "PENDING": return "Chờ xử lý";
-    case "PROCESSING": return "Đang xử lý";
+    case "PENDING":
+      return "Chờ xử lý";
+    case "PROCESSING":
+      return "Đang xử lý";
     case "RESOLVED":
-    case "APPROVED": return "Đã giải quyết";
-    case "REJECTED": return "Bị từ chối";
-    case "CANCELLED": return "Đã hủy";
-    default: return status;
+    case "APPROVED":
+      return "Đã giải quyết";
+    case "REJECTED":
+      return "Bị từ chối";
+    case "CANCELLED":
+      return "Đã hủy";
+    default:
+      return status;
   }
 };
 
 const statusBadgeClass = (status: string) => {
   switch (status) {
-    case "PENDING": return "px-2 py-0.5 text-xs font-semibold rounded bg-amber-50 text-amber-700 border border-amber-200";
-    case "PROCESSING": return "px-2 py-0.5 text-xs font-semibold rounded bg-blue-50 text-blue-700 border border-blue-200";
+    case "PENDING":
+      return "px-2 py-0.5 text-xs font-semibold rounded bg-amber-50 text-amber-700 border border-amber-200";
+    case "PROCESSING":
+      return "px-2 py-0.5 text-xs font-semibold rounded bg-blue-50 text-blue-700 border border-blue-200";
     case "RESOLVED":
-    case "APPROVED": return "px-2 py-0.5 text-xs font-semibold rounded bg-emerald-50 text-emerald-700 border border-emerald-200";
-    case "REJECTED": return "px-2 py-0.5 text-xs font-semibold rounded bg-red-50 text-red-700 border border-red-200";
-    case "CANCELLED": return "px-2 py-0.5 text-xs font-semibold rounded bg-gray-50 text-gray-700 border border-gray-200";
-    default: return "px-2 py-0.5 text-xs font-semibold rounded bg-gray-100 text-gray-800 border border-gray-300";
+    case "APPROVED":
+      return "px-2 py-0.5 text-xs font-semibold rounded bg-emerald-50 text-emerald-700 border border-emerald-200";
+    case "REJECTED":
+      return "px-2 py-0.5 text-xs font-semibold rounded bg-red-50 text-red-700 border border-red-200";
+    case "CANCELLED":
+      return "px-2 py-0.5 text-xs font-semibold rounded bg-gray-50 text-gray-700 border border-gray-200";
+    default:
+      return "px-2 py-0.5 text-xs font-semibold rounded bg-gray-100 text-gray-800 border border-gray-300";
   }
 };
 
@@ -99,7 +114,8 @@ export default function StaffExceptions() {
   const [requests, setRequests] = useState<RequestSupportDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [selectedRequest, setSelectedRequest] = useState<RequestSupportDto | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<RequestSupportDto | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -138,7 +154,9 @@ export default function StaffExceptions() {
         message: "",
       });
       fetchRequests();
-      setTimeout(() => { setSent(false); }, 3000);
+      setTimeout(() => {
+        setSent(false);
+      }, 3000);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Gửi yêu cầu hỗ trợ thất bại.");
@@ -158,13 +176,7 @@ export default function StaffExceptions() {
       {/* Thông tin liên hệ */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {contactItems.map(
-          ({
-            icon: Icon,
-            label,
-            value,
-            wrapperClass,
-            iconClass,
-          }) => (
+          ({ icon: Icon, label, value, wrapperClass, iconClass }) => (
             <div
               key={label}
               className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${wrapperClass}`}
@@ -174,7 +186,10 @@ export default function StaffExceptions() {
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-gray-500">{label}</div>
-                <div className="truncate text-sm font-semibold text-gray-800" title={value}>
+                <div
+                  className="truncate text-sm font-semibold text-gray-800"
+                  title={value}
+                >
                   {value}
                 </div>
               </div>
@@ -240,16 +255,24 @@ export default function StaffExceptions() {
                   Yêu cầu đã được gửi thành công!
                 </p>
                 <p className="text-center text-xs text-gray-500">
-                  Quản trị viên sẽ kiểm tra và phản hồi yêu cầu của bạn sớm nhất.
+                  Quản trị viên sẽ kiểm tra và phản hồi yêu cầu của bạn sớm
+                  nhất.
                 </p>
               </div>
             ) : (
               <>
-                {error && <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">{error}</div>}
+                {error && (
+                  <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">
+                    {error}
+                  </div>
+                )}
 
                 {/* Tiêu đề */}
                 <div>
-                  <label htmlFor="staff-support-subject" className="mb-1 block text-xs font-medium text-gray-600">
+                  <label
+                    htmlFor="staff-support-subject"
+                    className="mb-1 block text-xs font-medium text-gray-600"
+                  >
                     Tiêu đề <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -259,7 +282,9 @@ export default function StaffExceptions() {
                     className="h-[36px] w-full rounded border border-gray-300 px-3 text-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
                     placeholder="Nhập tiêu đề yêu cầu..."
                     value={form.subject}
-                    onChange={e => setForm(p => ({ ...p, subject: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, subject: e.target.value }))
+                    }
                   />
                   <div className="mt-1 text-right text-[10px] text-gray-400">
                     {form.subject.length}/150
@@ -268,7 +293,10 @@ export default function StaffExceptions() {
 
                 {/* Nội dung */}
                 <div>
-                  <label htmlFor="staff-support-message" className="mb-1 block text-xs font-medium text-gray-600">
+                  <label
+                    htmlFor="staff-support-message"
+                    className="mb-1 block text-xs font-medium text-gray-600"
+                  >
                     Nội dung <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -277,7 +305,9 @@ export default function StaffExceptions() {
                     className="h-28 w-full resize-none rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
                     placeholder="Mô tả chi tiết vấn đề cần hỗ trợ..."
                     value={form.message}
-                    onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, message: e.target.value }))
+                    }
                   />
                   <div className="mt-1 text-right text-[10px] text-gray-400">
                     {form.message.length}/1000
@@ -306,41 +336,79 @@ export default function StaffExceptions() {
           <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2.5">
             <div className="flex items-center gap-2">
               <LifeBuoy className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-semibold text-gray-700">Lịch sử yêu cầu đã gửi</span>
+              <span className="text-sm font-semibold text-gray-700">
+                Lịch sử yêu cầu đã gửi
+              </span>
             </div>
-            <button onClick={fetchRequests} className="text-xs text-blue-600 hover:underline">Tải lại</button>
+            <button
+              onClick={fetchRequests}
+              className="text-xs text-blue-600 hover:underline"
+            >
+              Tải lại
+            </button>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50/50">
-                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">Mã đơn</th>
-                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">Tiêu đề</th>
-                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">Trạng thái</th>
-                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">Ngày gửi</th>
-                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">Thao tác</th>
+                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">
+                    Mã đơn
+                  </th>
+                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">
+                    Tiêu đề
+                  </th>
+                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">
+                    Trạng thái
+                  </th>
+                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">
+                    Ngày gửi
+                  </th>
+                  <th className="px-4 py-2 text-xs font-semibold text-gray-600">
+                    Thao tác
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-8 text-gray-400 text-sm">Đang tải dữ liệu...</td>
+                    <td
+                      colSpan={5}
+                      className="text-center py-8 text-gray-400 text-sm"
+                    >
+                      Đang tải dữ liệu...
+                    </td>
                   </tr>
                 ) : requests.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-8 text-gray-400 text-sm">Chưa có yêu cầu hỗ trợ nào</td>
+                    <td
+                      colSpan={5}
+                      className="text-center py-8 text-gray-400 text-sm"
+                    >
+                      Chưa có yêu cầu hỗ trợ nào
+                    </td>
                   </tr>
                 ) : (
-                  requests.map(req => (
-                    <tr key={req.requestId} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-4 py-3 text-xs font-mono text-blue-700">{req.requestNo}</td>
-                      <td className="px-4 py-3 text-sm text-gray-800 break-words">{req.subject}</td>
+                  requests.map((req) => (
+                    <tr
+                      key={req.requestId}
+                      className="hover:bg-gray-50/50 transition-colors"
+                    >
+                      <td className="px-4 py-3 text-xs font-mono text-blue-700">
+                        {req.requestNo}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-800 break-words">
+                        {req.subject}
+                      </td>
                       <td className="px-4 py-3">
-                        <span className={statusBadgeClass(req.status)}>{mapStatusToVi(req.status)}</span>
+                        <span className={statusBadgeClass(req.status)}>
+                          {mapStatusToVi(req.status)}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-500">
-                        {req.createdAt ? new Date(req.createdAt).toLocaleString("vi-VN") : "—"}
+                        {req.createdAt
+                          ? new Date(req.createdAt).toLocaleString("vi-VN")
+                          : "—"}
                       </td>
                       <td className="px-4 py-3">
                         <button
@@ -364,50 +432,75 @@ export default function StaffExceptions() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden border border-gray-150">
             <div className="flex justify-between items-center bg-gray-50 px-4 py-3 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-700 text-sm">Chi tiết yêu cầu – {selectedRequest.requestNo}</h3>
-              <button onClick={() => setSelectedRequest(null)} className="text-gray-400 hover:text-gray-600">
+              <h3 className="font-semibold text-gray-700 text-sm">
+                Chi tiết yêu cầu – {selectedRequest.requestNo}
+              </h3>
+              <button
+                onClick={() => setSelectedRequest(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            
+
             <div className="p-4 space-y-3 text-sm max-h-[75vh] overflow-y-auto">
               <div className="grid grid-cols-3 gap-1 border-b border-gray-100 pb-2">
                 <span className="text-gray-500 font-medium">Tiêu đề:</span>
-                <span className="col-span-2 text-gray-800">{selectedRequest.subject}</span>
+                <span className="col-span-2 text-gray-800">
+                  {selectedRequest.subject}
+                </span>
               </div>
 
               <div className="grid grid-cols-3 gap-1 border-b border-gray-100 pb-2">
                 <span className="text-gray-500 font-medium">Trạng thái:</span>
                 <span className="col-span-2">
-                  <span className={statusBadgeClass(selectedRequest.status)}>{mapStatusToVi(selectedRequest.status)}</span>
+                  <span className={statusBadgeClass(selectedRequest.status)}>
+                    {mapStatusToVi(selectedRequest.status)}
+                  </span>
                 </span>
               </div>
 
               <div className="grid grid-cols-3 gap-1 border-b border-gray-100 pb-2">
                 <span className="text-gray-500 font-medium">Người gửi:</span>
-                <span className="col-span-2 text-gray-800">{selectedRequest.senderName || "—"}</span>
+                <span className="col-span-2 text-gray-800">
+                  {selectedRequest.senderName || "—"}
+                </span>
               </div>
 
               <div className="grid grid-cols-3 gap-1 border-b border-gray-100 pb-2">
-                <span className="text-gray-500 font-medium">Thời gian gửi:</span>
+                <span className="text-gray-500 font-medium">
+                  Thời gian gửi:
+                </span>
                 <span className="col-span-2 text-gray-800">
-                  {selectedRequest.createdAt ? new Date(selectedRequest.createdAt).toLocaleString("vi-VN") : "—"}
+                  {selectedRequest.createdAt
+                    ? new Date(selectedRequest.createdAt).toLocaleString(
+                        "vi-VN",
+                      )
+                    : "—"}
                 </span>
               </div>
 
               <div className="space-y-1 bg-gray-50 rounded p-2.5 border border-gray-200">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nội dung chi tiết:</div>
-                <div className="text-gray-700 whitespace-pre-wrap text-xs font-mono">{selectedRequest.description}</div>
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Nội dung chi tiết:
+                </div>
+                <div className="text-gray-700 whitespace-pre-wrap text-xs font-mono">
+                  {selectedRequest.description}
+                </div>
               </div>
 
               {selectedRequest.adminNote && (
                 <div className="space-y-1 bg-emerald-50/50 rounded p-2.5 border border-emerald-200 text-emerald-800">
-                  <div className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Phản hồi của Admin:</div>
-                  <div className="text-gray-700 whitespace-pre-wrap text-xs">{selectedRequest.adminNote}</div>
+                  <div className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
+                    Phản hồi của Admin:
+                  </div>
+                  <div className="text-gray-700 whitespace-pre-wrap text-xs">
+                    {selectedRequest.adminNote}
+                  </div>
                 </div>
               )}
             </div>
-            
+
             <div className="bg-gray-50 px-4 py-3 flex justify-end border-t border-gray-200">
               <button
                 onClick={() => setSelectedRequest(null)}

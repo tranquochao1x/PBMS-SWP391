@@ -35,7 +35,10 @@ interface Ticket extends TicketPayload {
 }
 
 // Helper utility to parse Vietnamese plates into 1-line or 2-line representations
-function parsePlateToLines(plate: string, type: string): { lines: string[]; lineCount: 1 | 2 } {
+function parsePlateToLines(
+  plate: string,
+  type: string,
+): { lines: string[]; lineCount: 1 | 2 } {
   const clean = (plate || "").trim().toUpperCase();
   if (clean.includes("-")) {
     const parts = clean.split("-");
@@ -44,7 +47,10 @@ function parsePlateToLines(plate: string, type: string): { lines: string[]; line
   if (type === "Xe máy") {
     const basic = clean.replace(/[^A-Z0-9]/g, "");
     if (basic.length >= 4) {
-      return { lines: [basic.substring(0, 4), basic.substring(4)], lineCount: 2 };
+      return {
+        lines: [basic.substring(0, 4), basic.substring(4)],
+        lineCount: 2,
+      };
     }
   }
   return { lines: [clean], lineCount: 1 };
@@ -61,17 +67,27 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
   const [printed, setPrinted] = useState(false);
 
   // Unified camera scanner states
-  const [activeScanner, setActiveScanner] = useState<"plate" | "ticket" | null>(null);
+  const [activeScanner, setActiveScanner] = useState<"plate" | "ticket" | null>(
+    null,
+  );
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState<string | null>(null);
   const [scanningTicket, setScanningTicket] = useState(false);
 
   // AI OCR and QR scan simulation states
-  const [ocrSteps, setOcrSteps] = useState<{ label: string; detail: string; status: "idle" | "running" | "success" | "failed" }[]>([]);
+  const [ocrSteps, setOcrSteps] = useState<
+    {
+      label: string;
+      detail: string;
+      status: "idle" | "running" | "success" | "failed";
+    }[]
+  >([]);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(-1);
 
   // Uploaded image preview state
-  const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null);
+  const [uploadedImagePreview, setUploadedImagePreview] = useState<
+    string | null
+  >(null);
   const [entryImage, setEntryImage] = useState<string | null>(null);
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -86,41 +102,51 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
 
   // Effect to manage camera start/stop for plate & ticket scanners
   useEffect(() => {
-    if ((activeScanner === "plate" || activeScanner === "ticket") && !uploadedImagePreview) {
+    if (
+      (activeScanner === "plate" || activeScanner === "ticket") &&
+      !uploadedImagePreview
+    ) {
       if (!navigator || !navigator.mediaDevices) {
         setErrorMsg("Trình duyệt không hỗ trợ camera.");
         setActiveScanner(null);
         return;
       }
       // Start camera feed
-      navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } }
-      })
-      .then(stream => {
-        if (activeScanner === "plate" && videoRef.current) {
-          videoRef.current.srcObject = stream;
-        } else if (activeScanner === "ticket" && ticketVideoRef.current) {
-          ticketVideoRef.current.srcObject = stream;
-        }
-        streamRef.current = stream;
-      })
-      .catch(err => {
-        console.error("Camera access failed", err);
-        setErrorMsg("Không thể truy cập camera. Vui lòng kiểm tra quyền hoặc tải ảnh lên.");
-        setActiveScanner(null);
-        setScanningTicket(false);
-      });
+      navigator.mediaDevices
+        .getUserMedia({
+          video: {
+            facingMode: "environment",
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+          },
+        })
+        .then((stream) => {
+          if (activeScanner === "plate" && videoRef.current) {
+            videoRef.current.srcObject = stream;
+          } else if (activeScanner === "ticket" && ticketVideoRef.current) {
+            ticketVideoRef.current.srcObject = stream;
+          }
+          streamRef.current = stream;
+        })
+        .catch((err) => {
+          console.error("Camera access failed", err);
+          setErrorMsg(
+            "Không thể truy cập camera. Vui lòng kiểm tra quyền hoặc tải ảnh lên.",
+          );
+          setActiveScanner(null);
+          setScanningTicket(false);
+        });
     } else {
       // Stop camera feed
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
       }
     }
 
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
   }, [activeScanner, uploadedImagePreview]);
@@ -146,10 +172,26 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
     setEntryImage(dataUrl);
 
     const steps = [
-      { label: "1. Phát hiện khung biển số", detail: "Đang phân tích khung hình...", status: "running" as const },
-      { label: "2. Căn thẳng ảnh biển số", detail: "Chờ phát hiện vị trí...", status: "idle" as const },
-      { label: "3. Nhận diện biển số (Gemini API)", detail: "Đang gọi Gemini API nhận dạng...", status: "idle" as const },
-      { label: "4. Ghép và kiểm tra định dạng", detail: "Chờ kết quả nhận dạng...", status: "idle" as const },
+      {
+        label: "1. Phát hiện khung biển số",
+        detail: "Đang phân tích khung hình...",
+        status: "running" as const,
+      },
+      {
+        label: "2. Căn thẳng ảnh biển số",
+        detail: "Chờ phát hiện vị trí...",
+        status: "idle" as const,
+      },
+      {
+        label: "3. Nhận diện biển số (Gemini API)",
+        detail: "Đang gọi Gemini API nhận dạng...",
+        status: "idle" as const,
+      },
+      {
+        label: "4. Ghép và kiểm tra định dạng",
+        detail: "Chờ kết quả nhận dạng...",
+        status: "idle" as const,
+      },
     ];
     setOcrSteps(steps);
     setActiveStepIndex(0);
@@ -184,22 +226,22 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
               {
                 parts: [
                   {
-                    text: "Identify and extract the license plate number of the vehicle from this image. Clean the output by removing all spaces, dots, dashes, and extra words. Return ONLY a JSON object with format {\"plate\": \"CLEAN_PLATE_NUMBER\"}."
+                    text: 'Identify and extract the license plate number of the vehicle from this image. Clean the output by removing all spaces, dots, dashes, and extra words. Return ONLY a JSON object with format {"plate": "CLEAN_PLATE_NUMBER"}.',
                   },
                   {
                     inlineData: {
                       mimeType: "image/jpeg",
                       data: base64Image,
-                    }
-                  }
-                ]
-              }
+                    },
+                  },
+                ],
+              },
             ],
             generationConfig: {
               responseMimeType: "application/json",
-            }
-          })
-        }
+            },
+          }),
+        },
       );
 
       if (!response.ok) {
@@ -213,7 +255,10 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
       }
 
       const parsed = JSON.parse(textResponse);
-      const recognizedPlate = (parsed.plate || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+      const recognizedPlate = (parsed.plate || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "");
 
       if (!recognizedPlate) {
         throw new Error("Không thể nhận diện biển số xe.");
@@ -241,7 +286,9 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
         steps[activeStepIndex >= 0 ? activeStepIndex : 2].status = "failed";
       }
       setOcrSteps([...steps]);
-      setErrorMsg(err.message || "Nhận diện biển số thất bại. Vui lòng nhập tay.");
+      setErrorMsg(
+        err.message || "Nhận diện biển số thất bại. Vui lòng nhập tay.",
+      );
       setScanning(false);
     }
   };
@@ -263,7 +310,9 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
     }
   };
 
-  const handlePlateImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePlateImageUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -302,7 +351,8 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
     setSuccessMsg(null);
 
     try {
-      const registrationInfo = await staffService.getPreBookedDetails(targetCode);
+      const registrationInfo =
+        await staffService.getPreBookedDetails(targetCode);
       setPreBookedCode(targetCode);
       setIsPreBooked(true);
 
@@ -316,18 +366,27 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
         setLoaiXe(regType);
       }
 
-      if (registrationInfo.floorCode && registrationInfo.floorCode.toUpperCase() !== selectedFloorCode.toUpperCase()) {
-        setErrorMsg(`Sai tầng! Vé này được đăng ký ở tầng ${registrationInfo.floorCode}, nhưng bạn đang trực ở tầng ${selectedFloorCode}.`);
+      if (
+        registrationInfo.floorCode &&
+        registrationInfo.floorCode.toUpperCase() !==
+          selectedFloorCode.toUpperCase()
+      ) {
+        setErrorMsg(
+          `Sai tầng! Vé này được đăng ký ở tầng ${registrationInfo.floorCode}, nhưng bạn đang trực ở tầng ${selectedFloorCode}.`,
+        );
       } else {
         setSuccessMsg(`Xác thực thành công vé đặt trước: ${targetCode}!`);
       }
-      
+
       setActiveScanner(null);
       setScanningTicket(false);
       setUploadedImagePreview(null);
     } catch (err: any) {
       console.error(err);
-      setErrorMsg(err.message || `Không tìm thấy vé đặt trước hợp lệ cho mã ${targetCode}.`);
+      setErrorMsg(
+        err.message ||
+          `Không tìm thấy vé đặt trước hợp lệ cho mã ${targetCode}.`,
+      );
       setScanningTicket(false);
       setActiveScanner(null);
     }
@@ -353,22 +412,22 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
               {
                 parts: [
                   {
-                    text: "Identify and extract the card number or reservation code (starting with CARD or RES followed by digits) from this image. Clean the output by removing all spaces. Return ONLY a JSON object with format {\"code\": \"CARD000005\"}."
+                    text: 'Identify and extract the card number or reservation code (starting with CARD or RES followed by digits) from this image. Clean the output by removing all spaces. Return ONLY a JSON object with format {"code": "CARD000005"}.',
                   },
                   {
                     inlineData: {
                       mimeType: "image/jpeg",
                       data: base64Image,
-                    }
-                  }
-                ]
-              }
+                    },
+                  },
+                ],
+              },
             ],
             generationConfig: {
               responseMimeType: "application/json",
-            }
-          })
-        }
+            },
+          }),
+        },
       );
 
       if (!response.ok) throw new Error("Lỗi kết nối Gemini API.");
@@ -377,7 +436,10 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
       if (!textResponse) throw new Error("Không nhận diện được kết quả.");
 
       const parsed = JSON.parse(textResponse);
-      const recognizedCode = (parsed.code || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+      const recognizedCode = (parsed.code || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "");
 
       if (!recognizedCode) throw new Error("Không tìm thấy mã trong ảnh.");
 
@@ -465,7 +527,10 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
       setPrinted(false);
 
       try {
-        localStorage.setItem("parking-ticket:last", resp.qrToken || resp.parkingSessionNo);
+        localStorage.setItem(
+          "parking-ticket:last",
+          resp.qrToken || resp.parkingSessionNo,
+        );
       } catch (e) {}
     } catch (err: any) {
       setErrorMsg(err.message || "Tạo vé xe thất bại.");
@@ -491,9 +556,11 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
     setSuccessMsg(null);
   };
 
-  const canCreate = bienSo.trim().length > 0 && !ticket && cardBarcode.trim().length === 10 && (
-    !isPreBooked || preBookedCode.trim().length > 0
-  );
+  const canCreate =
+    bienSo.trim().length > 0 &&
+    !ticket &&
+    cardBarcode.trim().length === 10 &&
+    (!isPreBooked || preBookedCode.trim().length > 0);
 
   return (
     <div className="space-y-3">
@@ -559,7 +626,7 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
               <div className="flex gap-2">
                 {[
                   { key: "Xe máy", label: "Xe máy", icon: Bike },
-                  { key: "Ô tô", label: "Ô tô", icon: Car }
+                  { key: "Ô tô", label: "Ô tô", icon: Car },
                 ].map(({ key, label, icon: Icon }) => (
                   <button
                     key={key}
@@ -599,7 +666,7 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
                     setErrorMsg(null);
                   }}
                 />
-                
+
                 <button
                   type="button"
                   disabled={Boolean(ticket) || activeScanner === "plate"}
@@ -632,11 +699,15 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
             {/* OCR Live Camera View */}
             {activeScanner === "plate" && (
               <div className="rounded-lg border border-gray-200 bg-slate-900 p-3 text-white space-y-3 animate-fadeIn">
-                <span className="block text-xs font-bold text-slate-400">TRÌNH QUÉT BIỂN SỐ XE VÀO</span>
-                
-                <div 
+                <span className="block text-xs font-bold text-slate-400">
+                  TRÌNH QUÉT BIỂN SỐ XE VÀO
+                </span>
+
+                <div
                   className={`relative w-full overflow-hidden rounded border bg-black transition-all ${
-                    activeScanner === "plate" ? "border-sky-400 shadow-lg" : "border-dashed border-gray-500"
+                    activeScanner === "plate"
+                      ? "border-sky-400 shadow-lg"
+                      : "border-dashed border-gray-500"
                   }`}
                   style={{ minHeight: "220px" }}
                 >
@@ -657,20 +728,21 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
 
                   {/* Bounding box dynamic overlays */}
                   {activeStepIndex >= 0 && (
-                    <div 
+                    <div
                       className={`absolute z-10 transition-all duration-300 rounded border-2 ${
-                        activeStepIndex >= 2 
-                          ? "border-green-400 bg-green-500/10 shadow-[0_0_15px_rgba(74,222,128,0.4)]" 
-                          : activeStepIndex >= 1 
-                          ? "border-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.3)]" 
-                          : "border-red-500 animate-pulse"
+                        activeStepIndex >= 2
+                          ? "border-green-400 bg-green-500/10 shadow-[0_0_15px_rgba(74,222,128,0.4)]"
+                          : activeStepIndex >= 1
+                            ? "border-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.3)]"
+                            : "border-red-500 animate-pulse"
                       }`}
                       style={{
                         width: "60%",
                         height: "30%",
                         top: "35%",
                         left: "20%",
-                        transform: activeStepIndex >= 1 ? "rotate(-1.2deg)" : "none"
+                        transform:
+                          activeStepIndex >= 1 ? "rotate(-1.2deg)" : "none",
                       }}
                     >
                       <div className="absolute left-0 top-0 h-3 w-3 rounded-tl border-l-[3px] border-t-[3px] border-inherit" />
@@ -745,12 +817,16 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
                       }}
                       className="rounded text-blue-600 focus:ring-blue-400"
                     />
-                    <span className="text-xs font-semibold text-gray-700">Dùng vé tháng / đặt trước</span>
+                    <span className="text-xs font-semibold text-gray-700">
+                      Dùng vé tháng / đặt trước
+                    </span>
                   </label>
 
                   {isPreBooked && (
                     <div className="space-y-1.5 pt-1 border-t border-blue-100/50 mt-1">
-                      <label className="block text-[11px] font-medium text-gray-600">Mã đặt trước (CARD... hoặc RES...)</label>
+                      <label className="block text-[11px] font-medium text-gray-600">
+                        Mã đặt trước (CARD... hoặc RES...)
+                      </label>
                       <div className="flex gap-2">
                         <input
                           className="h-[36px] flex-1 rounded border border-gray-300 px-3 text-xs uppercase outline-none focus:border-blue-400 disabled:bg-gray-100 font-mono"
@@ -759,10 +835,12 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
                           disabled={Boolean(ticket)}
                           onChange={(e) => setPreBookedCode(e.target.value)}
                         />
-                        
+
                         <button
                           type="button"
-                          disabled={Boolean(ticket) || activeScanner === "ticket"}
+                          disabled={
+                            Boolean(ticket) || activeScanner === "ticket"
+                          }
                           onClick={handleStartTicketScan}
                           className="h-[36px] px-3 rounded bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700 disabled:bg-blue-300 transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
                         >
@@ -772,7 +850,9 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
 
                         <button
                           type="button"
-                          disabled={Boolean(ticket) || activeScanner === "ticket"}
+                          disabled={
+                            Boolean(ticket) || activeScanner === "ticket"
+                          }
                           onClick={() => qrFileInputRef.current?.click()}
                           className="h-[36px] px-3 rounded bg-amber-500 text-xs font-semibold text-white hover:bg-amber-600 disabled:bg-amber-300 transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
                         >
@@ -793,11 +873,15 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
                   {/* Ticket OCR Camera scanner */}
                   {activeScanner === "ticket" && (
                     <div className="rounded border border-gray-200 bg-slate-900 p-2.5 text-white space-y-2 mt-2">
-                      <span className="block text-[11px] font-bold text-slate-400">TRÌNH QUÉT THẺ/VÉ</span>
-                      
-                      <div 
+                      <span className="block text-[11px] font-bold text-slate-400">
+                        TRÌNH QUÉT THẺ/VÉ
+                      </span>
+
+                      <div
                         className={`relative w-full overflow-hidden rounded bg-black transition-all ${
-                          scanningTicket ? "border-blue-400 animate-pulse" : "border-gray-500"
+                          scanningTicket
+                            ? "border-blue-400 animate-pulse"
+                            : "border-gray-500"
                         }`}
                         style={{ minHeight: "160px" }}
                       >
@@ -846,7 +930,8 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
                 {/* Nhập Barcode thẻ xe (Luôn luôn hiển thị ở dưới) */}
                 <div className="rounded border border-gray-150 bg-gray-50/50 p-3 space-y-1.5">
                   <label className="block text-[11px] font-semibold text-gray-700">
-                    Nhập Barcode thẻ xe (Đúng 10 ký tự) <span className="text-red-500">*</span>
+                    Nhập Barcode thẻ xe (Đúng 10 ký tự){" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -854,8 +939,8 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
                         cardBarcode.trim().length === 10
                           ? "border-green-500 focus:border-green-600 bg-green-50/20"
                           : cardBarcode.trim().length > 0
-                          ? "border-amber-400 focus:border-amber-500 bg-amber-50/10"
-                          : "border-gray-300 focus:border-blue-400"
+                            ? "border-amber-400 focus:border-amber-500 bg-amber-50/10"
+                            : "border-gray-300 focus:border-blue-400"
                       } disabled:bg-gray-100 font-bold tracking-wider`}
                       placeholder="VD: KZP1234567"
                       maxLength={10}
@@ -880,13 +965,24 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
             {/* Thông tin tự động */}
             <div className="space-y-2 rounded border border-gray-200 bg-gray-50 p-3">
               {[
-                ["Thời gian vào", ticket?.tgVao ?? new Date().toLocaleString("vi-VN")],
-                ["Mã vé", ticket?.maVe ?? (isPreBooked ? "Thẻ tháng / Đặt chỗ trước" : "Sẽ tạo khi bấm Tạo vé")],
+                [
+                  "Thời gian vào",
+                  ticket?.tgVao ?? new Date().toLocaleString("vi-VN"),
+                ],
+                [
+                  "Mã vé",
+                  ticket?.maVe ??
+                    (isPreBooked
+                      ? "Thẻ tháng / Đặt chỗ trước"
+                      : "Sẽ tạo khi bấm Tạo vé"),
+                ],
                 ["Tầng", selectedFloorCode || "Chưa chọn"],
               ].map(([label, value]) => (
                 <div key={label} className="flex justify-between text-xs">
                   <span className="text-gray-500">{label}:</span>
-                  <span className={`font-semibold ${label === "Mã vé" ? "text-blue-600" : "text-gray-700"}`}>
+                  <span
+                    className={`font-semibold ${label === "Mã vé" ? "text-blue-600" : "text-gray-700"}`}
+                  >
                     {value}
                   </span>
                 </div>

@@ -6,7 +6,11 @@ import VehicleExit from "./VehicleExit";
 import TransactionHistory from "./TransactionHistory";
 import StaffExceptions from "./StaffExceptions";
 import AdminFloorSlot from "../admin/AdminFloorSlot";
-import { staffService, FloorDto, StaffAssignmentDto } from "../../../services/staffService";
+import {
+  staffService,
+  FloorDto,
+  StaffAssignmentDto,
+} from "../../../services/staffService";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
 interface StaffAppProps {
@@ -17,7 +21,7 @@ interface StaffAppProps {
 export default function StaffApp({ staffName, onLogout }: StaffAppProps) {
   const [screen, setScreen] = useState<StaffScreen>("dashboard");
   const [floors, setFloors] = useState<FloorDto[]>([]);
-  
+
   const [selectedFloorCode, setSelectedFloorCode] = useState<string>("");
 
   const [assignment, setAssignment] = useState<StaffAssignmentDto | null>(null);
@@ -82,29 +86,32 @@ export default function StaffApp({ staffName, onLogout }: StaffAppProps) {
       try {
         const [startStr, endStr] = assignment.shiftTime.split(" – ");
         if (!startStr || !endStr) return true;
-        
+
         const [startH, startM] = startStr.split(":").map(Number);
         const [endH, endM] = endStr.split(":").map(Number);
-        
+
         const now = new Date();
         const shiftStart = new Date(now);
         shiftStart.setHours(startH, startM, 0, 0);
-        
+
         const shiftEnd = new Date(now);
         shiftEnd.setHours(endH, endM, 0, 0);
-        
+
         if (shiftEnd < shiftStart) {
-          if (now.getHours() < endH || (now.getHours() === endH && now.getMinutes() <= endM)) {
+          if (
+            now.getHours() < endH ||
+            (now.getHours() === endH && now.getMinutes() <= endM)
+          ) {
             shiftStart.setDate(shiftStart.getDate() - 1);
           } else {
             shiftEnd.setDate(shiftEnd.getDate() + 1);
           }
         }
-        
+
         // Cho phép sớm 1 tiếng và muộn 1 tiếng
         const bufferStart = new Date(shiftStart.getTime() - 60 * 60 * 1000);
         const bufferEnd = new Date(shiftEnd.getTime() + 60 * 60 * 1000);
-        
+
         return now >= bufferStart && now <= bufferEnd;
       } catch (e) {
         return true;
@@ -113,20 +120,25 @@ export default function StaffApp({ staffName, onLogout }: StaffAppProps) {
 
     const shiftActive = isShiftActive();
 
-    if ((!assignment || !shiftActive) && (screen === "vehicle-entry" || screen === "vehicle-exit")) {
+    if (
+      (!assignment || !shiftActive) &&
+      (screen === "vehicle-entry" || screen === "vehicle-exit")
+    ) {
       return (
         <div className="flex flex-col items-center justify-center py-20 px-4">
           <div className="bg-white border border-amber-200 rounded-lg p-6 max-w-md shadow-md text-center">
             <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
             <h2 className="text-base font-bold text-gray-800 mb-2">
-              {!assignment ? "Bạn chưa được phân công ca trực" : "Ngoài giờ làm việc"}
+              {!assignment
+                ? "Bạn chưa được phân công ca trực"
+                : "Ngoài giờ làm việc"}
             </h2>
             <p className="text-xs text-gray-500 leading-relaxed mb-4">
-              {!assignment 
+              {!assignment
                 ? "Hệ thống không tìm thấy lịch phân công trực hoạt động của bạn cho ngày hôm nay. Vui lòng liên hệ với Admin hoặc Tổ trưởng ca để được phân công Tầng làm việc."
                 : `Ca làm việc của bạn là từ ${assignment.shiftTime}. Hiện tại không nằm trong thời gian trực của bạn.`}
             </p>
-            <button 
+            <button
               onClick={loadData}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded shadow transition-colors cursor-pointer"
             >
@@ -141,17 +153,9 @@ export default function StaffApp({ staffName, onLogout }: StaffAppProps) {
       case "dashboard":
         return <StaffDashboard staffName={staffName} />;
       case "vehicle-entry":
-        return (
-          <VehicleEntry
-            selectedFloorCode={selectedFloorCode}
-          />
-        );
+        return <VehicleEntry selectedFloorCode={selectedFloorCode} />;
       case "vehicle-exit":
-        return (
-          <VehicleExit
-            selectedFloorCode={selectedFloorCode}
-          />
-        );
+        return <VehicleExit selectedFloorCode={selectedFloorCode} />;
       case "transaction-history":
         return <TransactionHistory />;
       case "exceptions":

@@ -32,7 +32,10 @@ interface TicketInfo {
   entryImage?: string;
 }
 
-function formatParkingDuration(checkInStr: string, checkOutStr: string): string {
+function formatParkingDuration(
+  checkInStr: string,
+  checkOutStr: string,
+): string {
   const start = new Date(checkInStr).getTime();
   const end = new Date(checkOutStr).getTime();
   if (isNaN(start) || isNaN(end)) {
@@ -68,7 +71,9 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
   }, [selectedFloorCode]);
 
   // Unified steps: "barcode" | "exit-plate" | "compare"
-  const [checkoutStep, setCheckoutStep] = useState<"barcode" | "exit-plate" | "compare">("barcode");
+  const [checkoutStep, setCheckoutStep] = useState<
+    "barcode" | "exit-plate" | "compare"
+  >("barcode");
 
   // Exit flow plate scanner states
   const [exitImage, setExitImage] = useState<string | null>(null);
@@ -77,7 +82,13 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
   const [ocrError, setOcrError] = useState<string | null>(null);
   const [plateMatchConfirmed, setPlateMatchConfirmed] = useState(false);
   const [exitVideoStreaming, setExitVideoStreaming] = useState(false);
-  const [ocrSteps, setOcrSteps] = useState<{ label: string; detail: string; status: "idle" | "running" | "success" | "failed" }[]>([]);
+  const [ocrSteps, setOcrSteps] = useState<
+    {
+      label: string;
+      detail: string;
+      status: "idle" | "running" | "success" | "failed";
+    }[]
+  >([]);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(-1);
 
   const exitVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -99,14 +110,20 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
     setExitVideoStreaming(true);
 
     if (!navigator || !navigator.mediaDevices) {
-      setOcrError("Trình duyệt không hỗ trợ camera hoặc yêu cầu kết nối HTTPS.");
+      setOcrError(
+        "Trình duyệt không hỗ trợ camera hoặc yêu cầu kết nối HTTPS.",
+      );
       setExitVideoStreaming(false);
       return;
     }
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } }
+        video: {
+          facingMode: "environment",
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+        },
       });
       exitStreamRef.current = stream;
       if (exitVideoRef.current) {
@@ -114,14 +131,16 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
       }
     } catch (err) {
       console.error("Camera access failed", err);
-      setOcrError("Không thể truy cập camera. Vui lòng kiểm tra quyền hoặc tải ảnh lên.");
+      setOcrError(
+        "Không thể truy cập camera. Vui lòng kiểm tra quyền hoặc tải ảnh lên.",
+      );
       setExitVideoStreaming(false);
     }
   };
 
   const stopExitCamera = () => {
     if (exitStreamRef.current) {
-      exitStreamRef.current.getTracks().forEach(track => track.stop());
+      exitStreamRef.current.getTracks().forEach((track) => track.stop());
       exitStreamRef.current = null;
     }
     setExitVideoStreaming(false);
@@ -136,22 +155,38 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
     setExitPlate("");
 
     const steps = [
-      { label: "1. Phát hiện khung biển số ra", detail: "Đang định vị biển số trong khung hình...", status: "running" as const },
-      { label: "2. Hiệu chỉnh góc nghiêng", detail: "Cân bằng góc xoay...", status: "idle" as const },
-      { label: "3. Nhận diện ký tự (Gemini API)", detail: "Đang gọi Gemini API trích xuất ký tự...", status: "idle" as const },
-      { label: "4. Đối chiếu thông tin", detail: "Chờ so sánh định dạng...", status: "idle" as const },
+      {
+        label: "1. Phát hiện khung biển số ra",
+        detail: "Đang định vị biển số trong khung hình...",
+        status: "running" as const,
+      },
+      {
+        label: "2. Hiệu chỉnh góc nghiêng",
+        detail: "Cân bằng góc xoay...",
+        status: "idle" as const,
+      },
+      {
+        label: "3. Nhận diện ký tự (Gemini API)",
+        detail: "Đang gọi Gemini API trích xuất ký tự...",
+        status: "idle" as const,
+      },
+      {
+        label: "4. Đối chiếu thông tin",
+        detail: "Chờ so sánh định dạng...",
+        status: "idle" as const,
+      },
     ];
     setOcrSteps(steps);
     setActiveStepIndex(0);
 
     try {
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 400));
       steps[0].status = "success";
       steps[1].status = "running";
       setOcrSteps([...steps]);
       setActiveStepIndex(1);
 
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 400));
       steps[1].status = "success";
       steps[2].status = "running";
       setOcrSteps([...steps]);
@@ -164,15 +199,19 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: "Identify and extract the license plate number of the vehicle from this image. Clean the output by removing all spaces, dots, dashes. Return ONLY a JSON object with format {\"plate\": \"CLEAN_PLATE_NUMBER\"}." },
-                { inlineData: { mimeType: "image/jpeg", data: base64Image } }
-              ]
-            }],
-            generationConfig: { responseMimeType: "application/json" }
-          })
-        }
+            contents: [
+              {
+                parts: [
+                  {
+                    text: 'Identify and extract the license plate number of the vehicle from this image. Clean the output by removing all spaces, dots, dashes. Return ONLY a JSON object with format {"plate": "CLEAN_PLATE_NUMBER"}.',
+                  },
+                  { inlineData: { mimeType: "image/jpeg", data: base64Image } },
+                ],
+              },
+            ],
+            generationConfig: { responseMimeType: "application/json" },
+          }),
+        },
       );
 
       if (!response.ok) throw new Error("Không thể kết nối đến Gemini API.");
@@ -181,7 +220,10 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
       if (!text) throw new Error("Không có phản hồi từ Gemini API.");
 
       const parsed = JSON.parse(text);
-      const recognized = (parsed.plate || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+      const recognized = (parsed.plate || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "");
 
       if (!recognized) throw new Error("Không nhận dạng được biển số.");
 
@@ -191,14 +233,14 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
       setOcrSteps([...steps]);
       setActiveStepIndex(3);
 
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 400));
       steps[3].status = "success";
       setOcrSteps([...steps]);
       setActiveStepIndex(4);
 
       setExitPlate(recognized);
       setIsOcrScanning(false);
-      
+
       // Auto compare
       handleComparePlates(recognized);
     } catch (err: any) {
@@ -276,7 +318,10 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
         tgRa: new Date(resp.checkOutAt || "").toLocaleString("vi-VN"),
         rawCheckInAt: resp.checkInAt,
         rawCheckOutAt: resp.checkOutAt || "",
-        thoiGianGui: formatParkingDuration(resp.checkInAt, resp.checkOutAt || ""),
+        thoiGianGui: formatParkingDuration(
+          resp.checkInAt,
+          resp.checkOutAt || "",
+        ),
         phi: resp.feeAmount,
         qrPayload: resp.qrToken,
         violationReason: resp.violationReason,
@@ -286,7 +331,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
       setTicket(ticketInfo);
       setNotFound(false);
       setConfirmed(false);
-      
+
       // Proceed to Step 2
       setCheckoutStep("exit-plate");
       setInputCode(""); // Reset input field to accept exit plate or manual plate input
@@ -305,7 +350,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
         parkingSessionNoOrQrToken: ticket.maVe,
         floorCode: floorCode,
         exitImage: exitImage || undefined,
-        exitPlate: exitPlate || undefined
+        exitPlate: exitPlate || undefined,
       });
       setConfirmed(true);
       try {
@@ -344,15 +389,19 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: "Identify and extract the ticket number, card barcode, or reservation code (e.g. TK000003, CARD000005, RES001, KZP1234567) from this ticket image. Clean the output by removing all spaces, dots, and dashes. Return ONLY a JSON object with format {\"code\": \"KZP1234567\"}." },
-                { inlineData: { mimeType: "image/jpeg", data: base64Image } }
-              ]
-            }],
-            generationConfig: { responseMimeType: "application/json" }
-          })
-        }
+            contents: [
+              {
+                parts: [
+                  {
+                    text: 'Identify and extract the ticket number, card barcode, or reservation code (e.g. TK000003, CARD000005, RES001, KZP1234567) from this ticket image. Clean the output by removing all spaces, dots, and dashes. Return ONLY a JSON object with format {"code": "KZP1234567"}.',
+                  },
+                  { inlineData: { mimeType: "image/jpeg", data: base64Image } },
+                ],
+              },
+            ],
+            generationConfig: { responseMimeType: "application/json" },
+          }),
+        },
       );
 
       if (!response.ok) throw new Error("Lỗi kết nối Gemini API.");
@@ -361,8 +410,12 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
       if (!text) throw new Error("Không nhận diện được phản hồi.");
 
       const parsed = JSON.parse(text);
-      const recognized = (parsed.code || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-      if (!recognized) throw new Error("Không tìm thấy mã vé/barcode trong ảnh.");
+      const recognized = (parsed.code || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "");
+      if (!recognized)
+        throw new Error("Không tìm thấy mã vé/barcode trong ảnh.");
 
       setInputCode(recognized);
       setIsOcrScanning(false);
@@ -387,7 +440,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
+        video: { facingMode: "environment" },
       });
       qrStreamRef.current = stream;
       if (qrVideoRef.current) {
@@ -402,7 +455,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
 
   const stopQrCamera = () => {
     if (qrStreamRef.current) {
-      qrStreamRef.current.getTracks().forEach(track => track.stop());
+      qrStreamRef.current.getTracks().forEach((track) => track.stop());
       qrStreamRef.current = null;
     }
     setQrCameraActive(false);
@@ -454,7 +507,6 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
       <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
         {/* Main interactive panel */}
         <div className="overflow-hidden rounded border border-gray-200 bg-white shadow-sm flex flex-col justify-between min-h-[480px]">
-          
           {/* Step 1: Barcode Entry */}
           {checkoutStep === "barcode" && (
             <div>
@@ -470,7 +522,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                   <label className="block text-xs font-medium text-gray-600">
                     Nhập barcode thẻ xe (Đúng 10 ký tự)
                   </label>
-                  
+
                   <div className="flex gap-2">
                     <input
                       className="h-[38px] flex-1 rounded border border-gray-300 px-3 text-sm uppercase outline-none focus:border-blue-400 font-mono font-bold tracking-wider"
@@ -483,7 +535,10 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                         setErrorMsg(null);
                       }}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" && inputCode.trim().length === 10) {
+                        if (
+                          e.key === "Enter" &&
+                          inputCode.trim().length === 10
+                        ) {
                           processCheckOut(inputCode);
                         }
                       }}
@@ -518,7 +573,20 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                     <div className="flex flex-col items-center justify-center gap-2 py-4">
                       <ScanLine className="h-10 w-10 text-gray-500" />
                       <p className="text-[11px] text-gray-400">
-                        Nhấn <span className="font-semibold text-blue-400 cursor-pointer" onClick={startQrCamera}>Mở camera quét vé</span> hoặc <span className="font-semibold text-amber-400 cursor-pointer" onClick={() => qrFileInputRef.current?.click()}>Tải ảnh vé</span>
+                        Nhấn{" "}
+                        <span
+                          className="font-semibold text-blue-400 cursor-pointer"
+                          onClick={startQrCamera}
+                        >
+                          Mở camera quét vé
+                        </span>{" "}
+                        hoặc{" "}
+                        <span
+                          className="font-semibold text-amber-400 cursor-pointer"
+                          onClick={() => qrFileInputRef.current?.click()}
+                        >
+                          Tải ảnh vé
+                        </span>
                       </p>
                     </div>
                   )}
@@ -526,7 +594,9 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                   {isOcrScanning && (
                     <div className="flex flex-col items-center justify-center gap-2 py-4">
                       <div className="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent border-sky-400" />
-                      <span className="text-xs text-sky-400 font-medium">Đang nhận diện barcode thẻ...</span>
+                      <span className="text-xs text-sky-400 font-medium">
+                        Đang nhận diện barcode thẻ...
+                      </span>
                     </div>
                   )}
 
@@ -595,14 +665,21 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
 
               <div className="p-4 space-y-4">
                 <div className="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
-                  🏷️ Đã tìm thấy vé: <span className="font-bold">{ticket?.maVe}</span> (Biển số vào: <span className="font-bold">{ticket?.bienSo}</span>). Vui lòng quét hoặc nhập biển số lúc ra để đối chiếu.
+                  🏷️ Đã tìm thấy vé:{" "}
+                  <span className="font-bold">{ticket?.maVe}</span> (Biển số
+                  vào: <span className="font-bold">{ticket?.bienSo}</span>). Vui
+                  lòng quét hoặc nhập biển số lúc ra để đối chiếu.
                 </div>
 
                 <div
                   className={`relative w-full overflow-hidden rounded-lg border-2 bg-slate-950 transition-all ${
-                    exitVideoStreaming ? "border-sky-400" : "border-dashed border-gray-400"
+                    exitVideoStreaming
+                      ? "border-sky-400"
+                      : "border-dashed border-gray-400"
                   }`}
-                  style={{ minHeight: exitVideoStreaming ? "220px" : undefined }}
+                  style={{
+                    minHeight: exitVideoStreaming ? "220px" : undefined,
+                  }}
                 >
                   {exitVideoStreaming && (
                     <video
@@ -615,20 +692,21 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
 
                   {/* Bounding box dynamic overlays */}
                   {activeStepIndex >= 0 && (
-                    <div 
+                    <div
                       className={`absolute z-10 transition-all duration-300 rounded border-2 ${
-                        activeStepIndex >= 2 
-                          ? "border-green-400 bg-green-500/10 shadow-[0_0_15px_rgba(74,222,128,0.4)]" 
-                          : activeStepIndex >= 1 
-                          ? "border-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.3)]" 
-                          : "border-red-500 animate-pulse"
+                        activeStepIndex >= 2
+                          ? "border-green-400 bg-green-500/10 shadow-[0_0_15px_rgba(74,222,128,0.4)]"
+                          : activeStepIndex >= 1
+                            ? "border-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.3)]"
+                            : "border-red-500 animate-pulse"
                       }`}
                       style={{
                         width: "60%",
                         height: "30%",
                         top: "35%",
                         left: "20%",
-                        transform: activeStepIndex >= 1 ? "rotate(-1.2deg)" : "none"
+                        transform:
+                          activeStepIndex >= 1 ? "rotate(-1.2deg)" : "none",
                       }}
                     >
                       <div className="absolute left-0 top-0 h-3 w-3 rounded-tl border-l-[3px] border-t-[3px] border-inherit" />
@@ -642,7 +720,13 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                     <div className="flex min-h-[140px] flex-col items-center justify-center gap-2 py-8">
                       <ScanLine className="h-12 w-12 text-gray-500" />
                       <p className="text-xs text-gray-400">
-                        Nhấn <span className="font-semibold text-blue-400 cursor-pointer" onClick={startExitCamera}>Mở camera chụp biển số</span>
+                        Nhấn{" "}
+                        <span
+                          className="font-semibold text-blue-400 cursor-pointer"
+                          onClick={startExitCamera}
+                        >
+                          Mở camera chụp biển số
+                        </span>
                       </p>
                     </div>
                   )}
@@ -723,9 +807,14 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                     className="h-[38px] flex-1 rounded border border-gray-300 px-3 text-sm outline-none transition focus:border-blue-400 uppercase font-bold tracking-wider"
                     placeholder="VD: 29A12345"
                     value={inputCode}
-                    onChange={(event) => setInputCode(event.target.value.toUpperCase())}
+                    onChange={(event) =>
+                      setInputCode(event.target.value.toUpperCase())
+                    }
                     onKeyDown={(event) => {
-                      if (event.key === "Enter" && inputCode.trim().length > 0) {
+                      if (
+                        event.key === "Enter" &&
+                        inputCode.trim().length > 0
+                      ) {
                         setExitPlate(inputCode.trim());
                         handleComparePlates(inputCode.trim());
                       }
@@ -768,31 +857,53 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                 <div className="grid grid-cols-2 gap-3">
                   {/* Entry Photo Info */}
                   <div className="space-y-1 bg-gray-50 p-2 rounded border border-gray-200">
-                    <span className="block text-xs text-gray-500 font-semibold">Ảnh xe lúc vào:</span>
+                    <span className="block text-xs text-gray-500 font-semibold">
+                      Ảnh xe lúc vào:
+                    </span>
                     <div className="h-32 border border-gray-300 rounded bg-black/5 overflow-hidden flex items-center justify-center">
                       {ticket?.entryImage ? (
-                        <img src={ticket.entryImage} alt="Entry Plate" className="h-full w-full object-contain" />
+                        <img
+                          src={ticket.entryImage}
+                          alt="Entry Plate"
+                          className="h-full w-full object-contain"
+                        />
                       ) : (
-                        <span className="text-xs text-gray-400">Không có ảnh vào</span>
+                        <span className="text-xs text-gray-400">
+                          Không có ảnh vào
+                        </span>
                       )}
                     </div>
                     <div className="text-xs text-center text-gray-700 mt-1">
-                      Biển số vào: <span className="font-bold text-blue-700 uppercase">{ticket?.bienSo}</span>
+                      Biển số vào:{" "}
+                      <span className="font-bold text-blue-700 uppercase">
+                        {ticket?.bienSo}
+                      </span>
                     </div>
                   </div>
 
                   {/* Exit Photo Info */}
                   <div className="space-y-1 bg-gray-50 p-2 rounded border border-gray-200">
-                    <span className="block text-xs text-gray-500 font-semibold">Ảnh xe lúc ra:</span>
+                    <span className="block text-xs text-gray-500 font-semibold">
+                      Ảnh xe lúc ra:
+                    </span>
                     <div className="h-32 border border-gray-300 rounded bg-black/5 overflow-hidden flex items-center justify-center">
                       {exitImage ? (
-                        <img src={exitImage} alt="Exit Plate" className="h-full w-full object-contain" />
+                        <img
+                          src={exitImage}
+                          alt="Exit Plate"
+                          className="h-full w-full object-contain"
+                        />
                       ) : (
-                        <span className="text-xs text-gray-400">Không có ảnh ra</span>
+                        <span className="text-xs text-gray-400">
+                          Không có ảnh ra
+                        </span>
                       )}
                     </div>
                     <div className="text-xs text-center text-gray-700 mt-1">
-                      Biển số ra: <span className="font-bold text-sky-700 uppercase">{exitPlate}</span>
+                      Biển số ra:{" "}
+                      <span className="font-bold text-sky-700 uppercase">
+                        {exitPlate}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -801,8 +912,12 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                   <div className="w-full rounded-lg border border-green-200 bg-green-50 px-4 py-3 flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-green-600" />
                     <div>
-                      <p className="text-xs font-bold text-green-700">Trạng thái: Hợp lệ</p>
-                      <p className="text-[11px] text-green-600">Biển số xe ra khớp hoàn toàn với biển số xe vào.</p>
+                      <p className="text-xs font-bold text-green-700">
+                        Trạng thái: Hợp lệ
+                      </p>
+                      <p className="text-[11px] text-green-600">
+                        Biển số xe ra khớp hoàn toàn với biển số xe vào.
+                      </p>
                     </div>
                   </div>
                 ) : (
@@ -810,8 +925,13 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                     <div className="flex items-center gap-2">
                       <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
                       <div>
-                        <p className="text-xs font-bold text-red-700">Trạng thái: Không trùng khớp!</p>
-                        <p className="text-[11px] text-red-600">Biển số lúc ra ({exitPlate}) khác với lúc vào ({ticket?.bienSo}).</p>
+                        <p className="text-xs font-bold text-red-700">
+                          Trạng thái: Không trùng khớp!
+                        </p>
+                        <p className="text-[11px] text-red-600">
+                          Biển số lúc ra ({exitPlate}) khác với lúc vào (
+                          {ticket?.bienSo}).
+                        </p>
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -873,7 +993,9 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
 
         {/* Ticket details right-side panel */}
         <div className="overflow-hidden rounded border border-gray-200 bg-white shadow-sm flex flex-col min-h-[480px]">
-          <div className={`flex items-center gap-2 px-4 py-2.5 ${ticket ? "bg-green-600" : "bg-gray-400"}`}>
+          <div
+            className={`flex items-center gap-2 px-4 py-2.5 ${ticket ? "bg-green-600" : "bg-gray-400"}`}
+          >
             <CreditCard className="h-4 w-4 text-white" />
             <span className="text-sm font-semibold text-white">
               Thông tin thanh toán & xuất xe
@@ -896,7 +1018,11 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                 Xử lý xe ra thành công!
               </p>
               <p className="mt-2 text-sm text-gray-500">
-                Xe <span className="font-semibold text-gray-700">{ticket.bienSo}</span> đã được ghi nhận rời bãi.
+                Xe{" "}
+                <span className="font-semibold text-gray-700">
+                  {ticket.bienSo}
+                </span>{" "}
+                đã được ghi nhận rời bãi.
               </p>
               <button
                 type="button"
@@ -910,28 +1036,50 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
             <div className="flex-1 flex flex-col justify-between p-4 space-y-4">
               <div className="space-y-2">
                 <div className="grid grid-cols-[120px_1fr] gap-2 text-xs leading-6 border-b border-gray-100 py-1">
-                  <span className="text-gray-500 font-medium">Mã vé (Barcode):</span>
-                  <span className="text-right text-gray-800 font-bold">{ticket.maVe}</span>
+                  <span className="text-gray-500 font-medium">
+                    Mã vé (Barcode):
+                  </span>
+                  <span className="text-right text-gray-800 font-bold">
+                    {ticket.maVe}
+                  </span>
                 </div>
                 <div className="grid grid-cols-[120px_1fr] gap-2 text-xs leading-6 border-b border-gray-100 py-1">
-                  <span className="text-gray-500 font-medium">Biển số vào:</span>
-                  <span className="text-right text-gray-800 font-bold">{ticket.bienSo}</span>
+                  <span className="text-gray-500 font-medium">
+                    Biển số vào:
+                  </span>
+                  <span className="text-right text-gray-800 font-bold">
+                    {ticket.bienSo}
+                  </span>
                 </div>
                 <div className="grid grid-cols-[120px_1fr] gap-2 text-xs leading-6 border-b border-gray-100 py-1">
                   <span className="text-gray-500 font-medium">Loại xe:</span>
-                  <span className="text-right text-gray-800 font-semibold">{ticket.loaiXe}</span>
+                  <span className="text-right text-gray-800 font-semibold">
+                    {ticket.loaiXe}
+                  </span>
                 </div>
                 <div className="grid grid-cols-[120px_1fr] gap-2 text-xs leading-6 border-b border-gray-100 py-1">
-                  <span className="text-gray-500 font-medium">Thời gian vào:</span>
-                  <span className="text-right text-gray-800 font-semibold">{ticket.tgVao}</span>
+                  <span className="text-gray-500 font-medium">
+                    Thời gian vào:
+                  </span>
+                  <span className="text-right text-gray-800 font-semibold">
+                    {ticket.tgVao}
+                  </span>
                 </div>
                 <div className="grid grid-cols-[120px_1fr] gap-2 text-xs leading-6 border-b border-gray-100 py-1">
-                  <span className="text-gray-500 font-medium">Thời gian ra:</span>
-                  <span className="text-right text-gray-800 font-semibold">{ticket.tgRa}</span>
+                  <span className="text-gray-500 font-medium">
+                    Thời gian ra:
+                  </span>
+                  <span className="text-right text-gray-800 font-semibold">
+                    {ticket.tgRa}
+                  </span>
                 </div>
                 <div className="grid grid-cols-[120px_1fr] gap-2 text-xs leading-6 border-b border-gray-100 py-1">
-                  <span className="text-gray-500 font-medium">Thời gian gửi:</span>
-                  <span className="text-right text-gray-800 font-semibold">{ticket.thoiGianGui}</span>
+                  <span className="text-gray-500 font-medium">
+                    Thời gian gửi:
+                  </span>
+                  <span className="text-right text-gray-800 font-semibold">
+                    {ticket.thoiGianGui}
+                  </span>
                 </div>
                 {ticket.violationReason && (
                   <div className="grid grid-cols-[120px_1fr] gap-2 text-xs leading-6 text-red-650 font-semibold bg-red-50 p-2 rounded border border-red-200 mt-2">
@@ -942,14 +1090,16 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
               </div>
 
               <div className="rounded-lg bg-blue-600 px-4 py-4 text-center">
-                <p className="text-xs text-blue-100">
-                  Tổng phí gửi xe
-                </p>
+                <p className="text-xs text-blue-100">Tổng phí gửi xe</p>
                 <p className="mt-1 text-2xl font-bold tabular-nums text-white">
                   {ticket.phi.toLocaleString("vi-VN")} VNĐ
                 </p>
                 <p className="mt-1 text-[10px] italic text-blue-200">
-                  {ticket.phi === 0 ? "Thanh toán bằng thẻ tháng / vé đặt trước" : (ticket.loaiXe.includes("Ô tô") ? "Vé lượt ô tô" : "Vé lượt xe máy")}
+                  {ticket.phi === 0
+                    ? "Thanh toán bằng thẻ tháng / vé đặt trước"
+                    : ticket.loaiXe.includes("Ô tô")
+                      ? "Vé lượt ô tô"
+                      : "Vé lượt xe máy"}
                 </p>
               </div>
 
@@ -958,7 +1108,9 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                   {ticket.phi > 0 ? (
                     <button
                       type="button"
-                      disabled={!plateMatchConfirmed || checkoutStep !== "compare"}
+                      disabled={
+                        !plateMatchConfirmed || checkoutStep !== "compare"
+                      }
                       onClick={() => setIsPaymentModalOpen(true)}
                       className="flex min-h-[42px] flex-1 items-center justify-center gap-2 rounded bg-blue-600 px-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed cursor-pointer shadow"
                     >
@@ -968,7 +1120,9 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                   ) : (
                     <button
                       type="button"
-                      disabled={!plateMatchConfirmed || checkoutStep !== "compare"}
+                      disabled={
+                        !plateMatchConfirmed || checkoutStep !== "compare"
+                      }
                       onClick={executeFinalCheckOut}
                       className="flex min-h-[42px] flex-1 items-center justify-center gap-2 rounded bg-green-600 px-3 text-sm font-semibold text-white transition-colors hover:bg-green-700 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed cursor-pointer shadow"
                     >
@@ -988,7 +1142,8 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
 
                 {checkoutStep !== "compare" && (
                   <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-2.5 text-[11px] text-yellow-800 text-center">
-                    ⚠️ Vui lòng hoàn tất nhập thông tin và đối chiếu biển số xe cột bên trái để tiếp tục.
+                    ⚠️ Vui lòng hoàn tất nhập thông tin và đối chiếu biển số xe
+                    cột bên trái để tiếp tục.
                   </div>
                 )}
               </div>

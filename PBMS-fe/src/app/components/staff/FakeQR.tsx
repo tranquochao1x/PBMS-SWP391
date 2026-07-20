@@ -17,7 +17,12 @@ export default function FakeQR({ value, size = 160 }: FakeQRProps) {
 
   const isFixed = (r: number, c: number) => {
     // Corner finder patterns
-    if ((r < 7 && c < 7) || (r < 7 && c >= CELLS - 7) || (r >= CELLS - 7 && c < 7)) return true;
+    if (
+      (r < 7 && c < 7) ||
+      (r < 7 && c >= CELLS - 7) ||
+      (r >= CELLS - 7 && c < 7)
+    )
+      return true;
     // Timing
     if (r === 6 || c === 6) return (r + c) % 2 === 0;
     return false;
@@ -26,7 +31,8 @@ export default function FakeQR({ value, size = 160 }: FakeQRProps) {
   const isDark = (r: number, c: number) => {
     if (isFixed(r, c)) {
       // Finder: border = dark, inner = light, center = dark
-      const inCorner = (rr: number, cc: number) => rr >= 0 && rr < 7 && cc >= 0 && cc < 7;
+      const inCorner = (rr: number, cc: number) =>
+        rr >= 0 && rr < 7 && cc >= 0 && cc < 7;
       if (inCorner(r, c)) {
         if (r === 0 || r === 6 || c === 0 || c === 6) return true;
         if (r === 1 || r === 5 || c === 1 || c === 5) return false;
@@ -58,7 +64,12 @@ export default function FakeQR({ value, size = 160 }: FakeQRProps) {
   }
 
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: "block", imageRendering: "pixelated" }}>
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ display: "block", imageRendering: "pixelated" }}
+    >
       <rect width={size} height={size} fill="white" />
       {cells.map(({ r, c, dark }) =>
         dark ? (
@@ -70,7 +81,7 @@ export default function FakeQR({ value, size = 160 }: FakeQRProps) {
             height={cell}
             fill="#111"
           />
-        ) : null
+        ) : null,
       )}
     </svg>
   );

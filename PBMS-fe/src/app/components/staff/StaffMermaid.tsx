@@ -5,7 +5,14 @@ import { GitBranch } from "lucide-react";
 mermaid.initialize({
   startOnLoad: false,
   theme: "default",
-  er: { diagramPadding: 20, layoutDirection: "TB", minEntityWidth: 100, minEntityHeight: 75, entityPadding: 15, useMaxWidth: true },
+  er: {
+    diagramPadding: 20,
+    layoutDirection: "TB",
+    minEntityWidth: 100,
+    minEntityHeight: 75,
+    entityPadding: 15,
+    useMaxWidth: true,
+  },
   flowchart: { useMaxWidth: true, htmlLabels: false, curve: "basis" },
   stateDiagram: { useMaxWidth: true },
 });
@@ -23,9 +30,18 @@ function MermaidChart({ code, title }: { code: string; title: string }) {
     ref.current.innerHTML = "";
     setError(null);
     setLoading(true);
-    mermaid.render(id, code)
-      .then(({ svg }) => { if (ref.current) { ref.current.innerHTML = svg; setLoading(false); } })
-      .catch(err => { setError(String(err)); setLoading(false); });
+    mermaid
+      .render(id, code)
+      .then(({ svg }) => {
+        if (ref.current) {
+          ref.current.innerHTML = svg;
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        setError(String(err));
+        setLoading(false);
+      });
   }, [code]);
 
   return (
@@ -35,11 +51,18 @@ function MermaidChart({ code, title }: { code: string; title: string }) {
         <span className="text-sm font-semibold text-gray-700">{title}</span>
       </div>
       <div className="p-4 overflow-auto min-h-[200px]">
-        {loading && <div className="flex items-center justify-center h-32 text-gray-400 text-sm animate-pulse">Rendering diagram...</div>}
-        {error
-          ? <pre className="text-xs text-red-600 bg-red-50 p-3 rounded whitespace-pre-wrap">{error}</pre>
-          : <div ref={ref} className="flex justify-center" />
-        }
+        {loading && (
+          <div className="flex items-center justify-center h-32 text-gray-400 text-sm animate-pulse">
+            Rendering diagram...
+          </div>
+        )}
+        {error ? (
+          <pre className="text-xs text-red-600 bg-red-50 p-3 rounded whitespace-pre-wrap">
+            {error}
+          </pre>
+        ) : (
+          <div ref={ref} className="flex justify-center" />
+        )}
       </div>
     </div>
   );
@@ -371,11 +394,11 @@ const TABS = [
   },
 ] as const;
 
-type TabKey = typeof TABS[number]["key"];
+type TabKey = (typeof TABS)[number]["key"];
 
 export default function StaffMermaid() {
   const [active, setActive] = useState<TabKey>("er");
-  const current = TABS.find(t => t.key === active)!;
+  const current = TABS.find((t) => t.key === active)!;
 
   return (
     <div className="space-y-3">
@@ -385,19 +408,24 @@ export default function StaffMermaid() {
         <span className="text-sm font-semibold text-gray-700">
           Mermaid Diagrams — Parking Building Management System
         </span>
-        <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">mermaid v11</span>
+        <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">
+          mermaid v11
+        </span>
       </div>
 
       {/* Tabs */}
       <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
         <div className="flex border-b border-gray-200 overflow-x-auto">
-          {TABS.map(tab => (
-            <button key={tab.key} onClick={() => setActive(tab.key)}
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActive(tab.key)}
               className={`flex-shrink-0 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors -mb-px ${
                 active === tab.key
                   ? "border-blue-600 text-blue-700 bg-blue-50"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}>
+              }`}
+            >
               {tab.label}
             </button>
           ))}
@@ -413,7 +441,9 @@ export default function StaffMermaid() {
       {/* Source */}
       <details className="bg-white border border-gray-200 rounded shadow-sm">
         <summary className="px-4 py-2.5 text-xs font-medium text-gray-500 cursor-pointer hover:text-gray-700 select-none flex items-center gap-1.5">
-          <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">{"</>"}</span>
+          <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+            {"</>"}
+          </span>
           View Mermaid source
         </summary>
         <pre className="px-4 pb-4 pt-2 text-xs text-gray-700 overflow-auto font-mono whitespace-pre leading-relaxed bg-gray-50 border-t border-gray-100">
