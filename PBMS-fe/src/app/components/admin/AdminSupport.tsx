@@ -28,79 +28,8 @@ interface SupportTicket {
   repliedAt?: string;
 }
 
-const initialTickets: SupportTicket[] = [
-  {
-    id: "SUP-001",
-    userName: "Nguyễn Văn An",
-    userId: "user01",
-    subject: "Không thể gia hạn thẻ tháng",
-    message: "Tôi bấm nút Gia hạn nhưng QR không hiện. Vui lòng hỗ trợ.",
-    createdAt: "2024-01-15 09:10",
-    status: "Chờ xử lý",
-  },
-  {
-    id: "SUP-002",
-    userName: "Trần Thị Bích",
-    userId: "user02",
-    subject: "Biển số xe bị sai trên thẻ tháng",
-    message:
-      "Biển số xe trên thẻ TM005 bị ghi sai. Đúng là 43A-999.11 nhưng hệ thống ghi 43A-999.10.",
-    createdAt: "2024-01-14 14:30",
-    status: "Đang xử lý",
-    assignedTo: "staff01",
-  },
-  {
-    id: "SUP-003",
-    userName: "Nguyễn Văn An",
-    userId: "user01",
-    subject: "Không vào được bãi dù thẻ còn hạn",
-    message:
-      "Sáng nay 8:00 thẻ TM001 vẫn còn hạn đến 31/12 nhưng barrier không mở khi quét thẻ.",
-    createdAt: "2024-01-14 08:15",
-    status: "Đã giải quyết",
-    assignedTo: "staff02",
-    reply:
-      "Đã kiểm tra và reset thiết bị quét ở cổng vào. Mời bạn thử lại, thẻ đã hoạt động bình thường.",
-    repliedAt: "2024-01-14 10:30",
-  },
-  {
-    id: "SUP-004",
-    userName: "Trần Thị Bích",
-    userId: "user02",
-    subject: "Hỏi về chính sách đổi tầng gửi xe",
-    message:
-      "Tôi muốn đổi từ Tầng B1 sang Tầng B2 cho thẻ ô tô. Có cần làm thủ tục gì không?",
-    createdAt: "2024-01-13 16:00",
-    status: "Đã giải quyết",
-    reply:
-      "Bạn có thể đến quầy lễ tân để yêu cầu đổi tầng. Không mất phí, chỉ cần mang thẻ gốc.",
-    repliedAt: "2024-01-13 17:15",
-  },
-  {
-    id: "SUP-005",
-    userName: "Nguyễn Văn An",
-    userId: "user01",
-    subject: "Yêu cầu xuất hóa đơn tháng 12",
-    message:
-      "Tôi cần hóa đơn VAT cho phí gửi xe tháng 12/2023 để quyết toán công ty. Vui lòng hỗ trợ.",
-    createdAt: "2024-01-12 10:00",
-    status: "Đang xử lý",
-    assignedTo: "staff01",
-  },
-  {
-    id: "SUP-006",
-    userName: "Trần Thị Bích",
-    userId: "user02",
-    subject: "Không nhận được email xác nhận",
-    message:
-      "Sau khi đăng ký thẻ tháng mới (TM010) tôi không nhận được email xác nhận. Vui lòng gửi lại.",
-    createdAt: "2024-01-11 09:00",
-    status: "Từ chối",
-    reply:
-      "Vui lòng kiểm tra hộp thư Spam/Junk. Email đã được gửi đúng địa chỉ.",
-    repliedAt: "2024-01-11 11:00",
-  },
-];
+// TODO: Load from backend API
+const initialTickets: SupportTicket[] = [];
 
 const STATUS_BADGE: Record<SupportStatus, string> = {
   "Chờ xử lý": "bg-yellow-100 text-yellow-700 border border-yellow-200",

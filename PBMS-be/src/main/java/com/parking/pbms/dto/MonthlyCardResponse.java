@@ -16,8 +16,10 @@ public class MonthlyCardResponse {
     private String loaiXe;
     private String bienSo;
     private String ngayDangKy;
+    private String effectiveFrom;
     private String ngayHetHan;
     private String tangGuiXe;
+    private String status;
     private String trangThai;
     private Integer soNgayConLai;
     private String checkoutUrl;

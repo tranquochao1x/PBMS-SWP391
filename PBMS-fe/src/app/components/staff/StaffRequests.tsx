@@ -33,58 +33,8 @@ interface StaffRequest {
   notes: string[];
 }
 
-const SAMPLE: StaffRequest[] = [
-  {
-    id: "REQ-002",
-    type: "Wrong Slot Parking Report",
-    user: "Trần Thị B",
-    vehicle: "51B-67890",
-    status: "Processing",
-    priority: "High",
-    assignedAt: "2026-06-13 08:10",
-    notes: [],
-  },
-  {
-    id: "REQ-006",
-    type: "Cannot Exit",
-    user: "Đỗ Thị F",
-    vehicle: "51B-44444",
-    status: "Processing",
-    priority: "High",
-    assignedAt: "2026-06-10 11:15",
-    notes: ["Đã kiểm tra máy đọc thẻ"],
-  },
-  {
-    id: "REQ-008",
-    type: "Wrong Slot Parking Report",
-    user: "Vũ Thị H",
-    vehicle: "51D-66666",
-    status: "Processing",
-    priority: "Medium",
-    assignedAt: "2026-06-09 16:30",
-    notes: [],
-  },
-  {
-    id: "REQ-009",
-    type: "Monthly Card Information Error",
-    user: "Cao Văn I",
-    vehicle: "51A-77777",
-    status: "Pending",
-    priority: "Low",
-    assignedAt: "2026-06-13 09:00",
-    notes: [],
-  },
-  {
-    id: "REQ-010",
-    type: "Penalty Appeal",
-    user: "Ngô Thị J",
-    vehicle: "51B-88888",
-    status: "Pending",
-    priority: "Medium",
-    assignedAt: "2026-06-13 10:30",
-    notes: [],
-  },
-];
+// TODO: Load from backend API
+const SAMPLE: StaffRequest[] = [];
 
 const statusBadge: Record<ReqStatus, string> = {
   Pending: cls.badge.amber,

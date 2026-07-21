@@ -30,48 +30,8 @@ interface Penalty {
   status: PenaltyStatus;
 }
 
-const SAMPLE: Penalty[] = [
-  {
-    id: "PEN-001",
-    vehicle: "51A-12345",
-    type: "Wrong Slot",
-    amount: 200000,
-    date: "2026-06-10",
-    status: "Approved-Unpaid",
-  },
-  {
-    id: "PEN-002",
-    vehicle: "51A-12345",
-    type: "Overnight",
-    amount: 500000,
-    date: "2026-06-08",
-    status: "Paid",
-  },
-  {
-    id: "PEN-003",
-    vehicle: "51A-12345",
-    type: "Overtime",
-    amount: 100000,
-    date: "2026-06-05",
-    status: "Refund Pending",
-  },
-  {
-    id: "PEN-004",
-    vehicle: "51A-12345",
-    type: "Wrong Slot",
-    amount: 200000,
-    date: "2026-06-01",
-    status: "Waived",
-  },
-  {
-    id: "PEN-005",
-    vehicle: "51A-12345",
-    type: "Overtime",
-    amount: 150000,
-    date: "2026-05-28",
-    status: "Refunded",
-  },
-];
+// TODO: Load from backend API
+const SAMPLE: Penalty[] = [];
 
 const statusBadge: Record<PenaltyStatus, string> = {
   "Pending Approval": cls.badge.gray,

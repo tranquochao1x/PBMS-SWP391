@@ -22,60 +22,8 @@ interface Violation {
   status: VStatus;
 }
 
-const MY_REPORTS: Violation[] = [
-  {
-    id: "VIO-001",
-    vehiclePlate: "51A-12345",
-    user: "Nguyễn Văn A",
-    monthlyCard: "MC-C-001",
-    slotCode: "B1-A02",
-    type: "Wrong Slot",
-    amount: 200000,
-    evidence: "Camera B1 06:55",
-    relatedRequestId: "REQ-005",
-    date: "2026-06-13",
-    status: "Pending Approval",
-  },
-  {
-    id: "VIO-003",
-    vehiclePlate: "51C-11111",
-    user: "Lê Văn C",
-    monthlyCard: "MC-C-003",
-    slotCode: "B1-B02",
-    type: "Overtime",
-    amount: 100000,
-    evidence: "Camera B1 20:30",
-    relatedRequestId: "",
-    date: "2026-06-11",
-    status: "Paid",
-  },
-  {
-    id: "VIO-005",
-    vehiclePlate: "51A-33333",
-    user: "Hoàng Văn E",
-    monthlyCard: "MC-C-005",
-    slotCode: "B1-A04",
-    type: "Overnight",
-    amount: 500000,
-    evidence: "Camera B1 22:50",
-    relatedRequestId: "",
-    date: "2026-06-09",
-    status: "Approved-Unpaid",
-  },
-  {
-    id: "VIO-007",
-    vehiclePlate: "51B-55555",
-    user: "",
-    monthlyCard: "",
-    slotCode: "B2-A03",
-    type: "Wrong Slot",
-    amount: 200000,
-    evidence: "Camera B2 14:30",
-    relatedRequestId: "",
-    date: "2026-06-08",
-    status: "Rejected",
-  },
-];
+// TODO: Load from backend API
+const MY_REPORTS: Violation[] = [];
 
 const statusBadge: Record<VStatus, string> = {
   "Pending Approval": cls.badge.amber,

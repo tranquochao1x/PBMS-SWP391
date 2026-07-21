@@ -11,86 +11,8 @@ import { DateInput, FilterGroup } from "../common/DateInput";
 import { DataTable, Column } from "../common/DataTable";
 import { Pagination } from "../common/Pagination";
 
-const mockData = [
-  {
-    id: 1,
-    stt: 1,
-    thoiGian: "2024-01-15 08:45:12",
-    cardNo: "0000000000",
-    maThe: "---",
-    bienSo: "59Z-999.99",
-    hinhAnh: "img",
-    canhBao: "Không tồn tại trên hệ thống",
-    lanRa: "A",
-    nhanVienGiamSat: "staff01",
-    moTa: "Quẹt thẻ không nhận dạng được",
-  },
-  {
-    id: 2,
-    stt: 2,
-    thoiGian: "2024-01-15 09:02:33",
-    cardNo: "0000000001",
-    maThe: "---",
-    bienSo: "51X-111.11",
-    hinhAnh: "img",
-    canhBao: "Không tồn tại trên hệ thống",
-    lanRa: "B",
-    nhanVienGiamSat: "staff02",
-    moTa: "Quẹt thẻ không nhận dạng được",
-  },
-  {
-    id: 3,
-    stt: 3,
-    thoiGian: "2024-01-14 14:30:20",
-    cardNo: "0000000002",
-    maThe: "---",
-    bienSo: "30K-222.33",
-    hinhAnh: "img",
-    canhBao: "Không tồn tại trên hệ thống",
-    lanRa: "C",
-    nhanVienGiamSat: "staff01",
-    moTa: "Quẹt thẻ không nhận dạng được",
-  },
-  {
-    id: 4,
-    stt: 4,
-    thoiGian: "2024-01-14 16:22:08",
-    cardNo: "0000000003",
-    maThe: "---",
-    bienSo: "43B-555.77",
-    hinhAnh: "img",
-    canhBao: "Không tồn tại trên hệ thống",
-    lanRa: "D",
-    nhanVienGiamSat: "staff01",
-    moTa: "Quẹt thẻ không nhận dạng được",
-  },
-  {
-    id: 5,
-    stt: 5,
-    thoiGian: "2024-01-13 11:05:44",
-    cardNo: "0000000004",
-    maThe: "---",
-    bienSo: "61D-888.00",
-    hinhAnh: "img",
-    canhBao: "Không tồn tại trên hệ thống",
-    lanRa: "E",
-    nhanVienGiamSat: "staff02",
-    moTa: "Quẹt thẻ không nhận dạng được",
-  },
-  {
-    id: 6,
-    stt: 6,
-    thoiGian: "2024-01-13 15:40:10",
-    cardNo: "0000000005",
-    maThe: "---",
-    bienSo: "29T-101.01",
-    hinhAnh: "img",
-    canhBao: "Không tồn tại trên hệ thống",
-    lanRa: "F",
-    nhanVienGiamSat: "staff02",
-    moTa: "Quẹt thẻ không nhận dạng được",
-  },
-];
+// TODO: Load from backend API
+const mockData: any[] = [];
 
 const columns: Column[] = [
   { key: "stt", label: "STT", width: "40px" },
@@ -123,8 +45,8 @@ const columns: Column[] = [
 
 export default function AlertEvents() {
   const [keyword, setKeyword] = useState("");
-  const [fromDate, setFromDate] = useState("2024-01-13");
-  const [toDate, setToDate] = useState("2024-01-15");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [lan, setLan] = useState("");
   const [nguoiDung, setNguoiDung] = useState("");
   const [page, setPage] = useState(1);

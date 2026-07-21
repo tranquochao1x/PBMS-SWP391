@@ -11,71 +11,8 @@ interface Ticket {
   trangThai: "ACTIVE";
 }
 
-const activeTickets: Ticket[] = [
-  {
-    id: 1,
-    maVe: "TK000021",
-    bienSo: "59A-123.45",
-    loaiXe: "Xe máy",
-    tgVao: "14:22:10 15/01/2024",
-    thoiGian: "45 phút",
-    trangThai: "ACTIVE",
-  },
-  {
-    id: 2,
-    maVe: "TK000017",
-    bienSo: "43A-999.11",
-    loaiXe: "Xe máy",
-    tgVao: "13:05:33 15/01/2024",
-    thoiGian: "1 giờ 12 phút",
-    trangThai: "ACTIVE",
-  },
-  {
-    id: 3,
-    maVe: "TK000013",
-    bienSo: "52C-222.44",
-    loaiXe: "Ô tô",
-    tgVao: "11:55:20 15/01/2024",
-    thoiGian: "2 giờ 22 phút",
-    trangThai: "ACTIVE",
-  },
-  {
-    id: 4,
-    maVe: "TK000009",
-    bienSo: "30G-456.78",
-    loaiXe: "Ô tô",
-    tgVao: "10:30:05 15/01/2024",
-    thoiGian: "3 giờ 47 phút",
-    trangThai: "ACTIVE",
-  },
-  {
-    id: 5,
-    maVe: "TK000005",
-    bienSo: "61C-333.55",
-    loaiXe: "Xe máy",
-    tgVao: "09:10:40 15/01/2024",
-    thoiGian: "5 giờ 07 phút",
-    trangThai: "ACTIVE",
-  },
-  {
-    id: 6,
-    maVe: "TK000003",
-    bienSo: "29X3-144.84",
-    loaiXe: "Xe máy",
-    tgVao: "08:45:22 15/01/2024",
-    thoiGian: "5 giờ 32 phút",
-    trangThai: "ACTIVE",
-  },
-  {
-    id: 7,
-    maVe: "TK000001",
-    bienSo: "51F-888.88",
-    loaiXe: "Ô tô",
-    tgVao: "08:15:10 15/01/2024",
-    thoiGian: "6 giờ 02 phút",
-    trangThai: "ACTIVE",
-  },
-];
+// TODO: Load from backend API
+const activeTickets: Ticket[] = [];
 
 export default function ActiveTickets() {
   const [bienSo, setBienSo] = useState("");

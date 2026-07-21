@@ -22,20 +22,8 @@ const nextDays = Array.from({ length: 7 }, (_, i) => {
   return d.toLocaleDateString("en-CA");
 });
 
-const MONTHLY_CARDS = [
-  {
-    id: "MC-C-001",
-    label: "MC-C-001 – 51A-12345 (ô tô)",
-    plate: "51A-12345",
-    type: "car",
-  },
-  {
-    id: "MC-C-002",
-    label: "MC-C-002 – 51B-67890 (ô tô)",
-    plate: "51B-67890",
-    type: "car",
-  },
-];
+// TODO: Load from backend API
+const MONTHLY_CARDS: any[] = [];
 
 function buildSlots(floor: string, zone: string): Slot[] {
   if (!floor || !zone) return [];

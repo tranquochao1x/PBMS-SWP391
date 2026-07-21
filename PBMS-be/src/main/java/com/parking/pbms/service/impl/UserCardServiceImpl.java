@@ -191,10 +191,9 @@ public class UserCardServiceImpl implements UserCardService {
                 ? today.plusMonths(request.duration())
                 : oldExpiry.plusMonths(request.duration());
 
-        // Cập nhật thẻ ngay: gán ExpireAt mới và đảm bảo trạng thái ACTIVE
-        card.setExpireAt(newExpiry);
-        card.setStatus("ACTIVE");
-        cardRepository.save(card);
+        // GIỮ NGUYÊN bảng Cards (TUYỆT ĐỐI KHÔNG cập nhật ExpireAt hay Status của Cards ở bước này)
+        // Việc cập nhật chỉ được thực hiện khi thanh toán VNPay thành công (ResponseCode = 00)
+
 
         java.math.BigDecimal calculatedAmount = calculateAmount(cardGroup, request.duration());
 
@@ -314,8 +313,10 @@ public class UserCardServiceImpl implements UserCardService {
                 .loaiXe(loaiXe)
                 .bienSo(bienSo)
                 .ngayDangKy(card.getRegisteredAt() != null ? card.getRegisteredAt().toString() : "")
+                .effectiveFrom(card.getEffectiveFrom() != null ? card.getEffectiveFrom().toString() : "")
                 .ngayHetHan(card.getExpireAt() != null ? card.getExpireAt().toString() : "")
                 .tangGuiXe(tangGuiXe)
+                .status(card.getStatus())
                 .trangThai(trangThai)
                 .soNgayConLai(remainingDays)
                 .build();

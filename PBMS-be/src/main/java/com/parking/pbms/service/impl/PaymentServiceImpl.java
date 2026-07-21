@@ -281,7 +281,9 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             String responseCode = params.get("vnp_ResponseCode");
-            if ("00".equals(responseCode)) {
+            String transactionStatus = params.get("vnp_TransactionStatus");
+            
+            if ("00".equals(responseCode) && "00".equals(transactionStatus)) {
                 payment.setStatus("PAID");
                 payment.setPaidAt(LocalDateTime.now());
                 paymentRepository.save(payment);
@@ -312,6 +314,15 @@ public class PaymentServiceImpl implements PaymentService {
             } else {
                 payment.setStatus("CANCELLED");
                 paymentRepository.save(payment);
+
+                if ("CARD_REGISTRATION".equalsIgnoreCase(payment.getPaymentType())) {
+                    Card card = cardRepository.findById(payment.getCardId()).orElse(null);
+                    if (card != null) {
+                        card.setStatus("INACTIVE");
+                        cardRepository.save(card);
+                    }
+                }
+                // CARD_RENEWAL: Giữ nguyên trạng thái và ngày hết hạn cũ, tuyệt đối không cập nhật
             }
 
             response.put("RspCode", "00");
@@ -364,6 +375,7 @@ public class PaymentServiceImpl implements PaymentService {
                 cardRepository.save(card);
             }
         }
+        // CARD_RENEWAL: Giữ nguyên trạng thái và ngày hết hạn cũ, tuyệt đối không cập nhật
     }
 
     @Override

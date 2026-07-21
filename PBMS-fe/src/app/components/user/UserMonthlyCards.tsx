@@ -39,15 +39,17 @@ interface MonthlyCard {
   loaiXe: string;
   bienSo: string;
   ngayDangKy: string;
+  ngayKichHoat: string;
   ngayHetHan: string;
   tangGuiXe?: string;
-  trangThai: "Hoạt động" | "Hết hạn" | "Sắp hết hạn";
+  status: string;
+  trangThai: "Hoạt động" | "Đã hết hạn" | "Sắp hết hạn" | "Chưa hoạt động";
   soNgayConLai: number;
 }
 
 type NewMonthlyCard = Omit<
   MonthlyCard,
-  "id" | "cardNo" | "trangThai" | "soNgayConLai"
+  "id" | "cardNo" | "trangThai" | "soNgayConLai" | "ngayKichHoat" | "status"
 >;
 
 function parseDateOnly(dateStr: string): Date {
@@ -104,15 +106,35 @@ function differenceInDays(
 }
 
 function getCardStatus(
-  expireAt: string,
+  ngayKichHoatStr: string,
+  expireAtStr: string,
 ): Pick<MonthlyCard, "trangThai" | "soNgayConLai"> {
-  const remainingDays = differenceInDays(expireAt);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const ngayKichHoat = new Date(ngayKichHoatStr);
+  ngayKichHoat.setHours(0, 0, 0, 0);
+
+  const expireAt = new Date(expireAtStr);
+  expireAt.setHours(0, 0, 0, 0);
+
+  // TRƯỜNG HỢP 1: Chưa đến ngày thẻ có hiệu lực
+  if (today < ngayKichHoat) {
+    const daysToStart = Math.ceil((ngayKichHoat.getTime() - today.getTime()) / (1000 * 3600 * 24));
+    return {
+      trangThai: "Chưa hoạt động",
+      soNgayConLai: daysToStart,
+    };
+  }
+
+  // TRƯỜNG HỢP 2 & 3: Đã đến ngày hiệu lực
+  const remainingDays = Math.ceil((expireAt.getTime() - today.getTime()) / (1000 * 3600 * 24));
 
   return {
     trangThai:
       remainingDays < 0
-        ? "Hết hạn"
-        : remainingDays <= 14
+        ? "Đã hết hạn"
+        : remainingDays <= 3
           ? "Sắp hết hạn"
           : "Hoạt động",
     soNgayConLai: remainingDays,
@@ -122,7 +144,7 @@ function getCardStatus(
 function refreshCardStatus(card: MonthlyCard): MonthlyCard {
   return {
     ...card,
-    ...getCardStatus(card.ngayHetHan),
+    ...getCardStatus(card.ngayKichHoat, card.ngayHetHan),
   };
 }
 
@@ -154,10 +176,17 @@ function StatusBadge({ card }: { card: MonthlyCard }) {
         Sắp hết hạn
       </span>
     );
+  if (card.trangThai === "Chưa hoạt động")
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+        <Clock className="w-3 h-3" />
+        Chưa hoạt động
+      </span>
+    );
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
       <X className="w-3 h-3" />
-      Hết hạn
+      Đã hết hạn
     </span>
   );
 }
@@ -215,7 +244,7 @@ function AddCardModal({
   // ── Filter biển số theo loại xe của nhóm thẻ ─────────────────────
   const requiredVehicleType = selectedGroup?.vehicleType ?? "MOTORCYCLE";
   const filteredVehicles = myVehicles.filter(
-    (v) => v.vehicleType.toUpperCase() === requiredVehicleType.toUpperCase(),
+    (v) => v.vehicleType?.toUpperCase() === requiredVehicleType?.toUpperCase(),
   );
   const noMatchingVehicle = filteredVehicles.length === 0;
 
@@ -601,6 +630,7 @@ function DetailModal({
               ["Biển số xe", card.bienSo],
               ...(card.tangGuiXe ? [["Tầng gửi xe", card.tangGuiXe]] : []),
               ["Ngày đăng ký", card.ngayDangKy],
+              ["Ngày bắt đầu", card.ngayKichHoat],
               ["Ngày hết hạn", card.ngayHetHan],
             ].map(([label, value]) => (
               <div
@@ -618,7 +648,12 @@ function DetailModal({
               <StatusBadge card={card} />
             </div>
           </div>
-          {card.soNgayConLai > 0 && (
+          {card.trangThai === "Chưa hoạt động" ? (
+            <div className="bg-gray-50 border border-gray-200 rounded px-3 py-2 text-xs text-gray-600 flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              Thẻ sẽ bắt đầu hoạt động sau <strong>{card.soNgayConLai}</strong> ngày
+            </div>
+          ) : card.soNgayConLai > 0 && (
             <div className="bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-700 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" />
               Còn <strong>{card.soNgayConLai}</strong> ngày hiệu lực
@@ -819,7 +854,10 @@ export default function UserMonthlyCards() {
         cardService.getMyCards(),
         cardService.getActiveCardGroups(),
       ]);
-      setCards(myCards);
+      const visibleCards = myCards
+        .filter((c) => c.status !== "INACTIVE")
+        .map(refreshCardStatus);
+      setCards(visibleCards);
       setCardGroups(groups);
       setError("");
     } catch (err: any) {
@@ -1055,8 +1093,8 @@ export default function UserMonthlyCards() {
     setRenewCard(card);
   };
 
-  const active = cards.filter((c) => c.trangThai !== "Hết hạn").length;
-  const expired = cards.filter((c) => c.trangThai === "Hết hạn").length;
+  const active = cards.filter((c) => c.trangThai === "Hoạt động" || c.trangThai === "Sắp hết hạn").length;
+  const expired = cards.filter((c) => c.trangThai === "Đã hết hạn").length;
 
   return (
     <div className="space-y-3">
@@ -1125,14 +1163,14 @@ export default function UserMonthlyCards() {
           cards.map((card) => (
             <div
               key={card.id}
-              className={`bg-white border rounded shadow-sm overflow-hidden ${card.trangThai === "Hết hạn" ? "border-red-200" : card.trangThai === "Sắp hết hạn" ? "border-amber-200" : "border-gray-200"}`}
+              className={`bg-white border rounded shadow-sm overflow-hidden ${card.trangThai === "Đã hết hạn" ? "border-red-200" : card.trangThai === "Sắp hết hạn" ? "border-amber-200" : card.trangThai === "Chưa hoạt động" ? "border-gray-300 opacity-80" : "border-gray-200"}`}
             >
               <div
-                className={`px-4 py-2.5 flex items-center justify-between ${card.trangThai === "Hết hạn" ? "bg-red-50" : card.trangThai === "Sắp hết hạn" ? "bg-amber-50" : "bg-gray-50"}`}
+                className={`px-4 py-2.5 flex items-center justify-between ${card.trangThai === "Đã hết hạn" ? "bg-red-50" : card.trangThai === "Sắp hết hạn" ? "bg-amber-50" : card.trangThai === "Chưa hoạt động" ? "bg-gray-100" : "bg-gray-50"}`}
               >
                 <div className="flex items-center gap-2">
                   <CreditCard
-                    className={`w-4 h-4 ${card.trangThai === "Hết hạn" ? "text-red-500" : card.trangThai === "Sắp hết hạn" ? "text-amber-500" : "text-blue-500"}`}
+                    className={`w-4 h-4 ${card.trangThai === "Đã hết hạn" ? "text-red-500" : card.trangThai === "Sắp hết hạn" ? "text-amber-500" : card.trangThai === "Chưa hoạt động" ? "text-gray-400" : "text-blue-500"}`}
                   />
                   <span className="text-sm font-bold text-gray-800 font-mono">
                     {card.cardNo}
@@ -1141,7 +1179,7 @@ export default function UserMonthlyCards() {
                 <StatusBadge card={card} />
               </div>
               <div
-                className={`px-4 py-3 grid gap-4 text-sm ${card.tangGuiXe ? "grid-cols-5" : "grid-cols-4"}`}
+                className={`px-4 py-3 grid gap-4 text-sm ${card.tangGuiXe ? "grid-cols-6" : "grid-cols-5"}`}
               >
                 <div>
                   <div className="text-xs text-gray-400 mb-0.5">Loại xe</div>
@@ -1168,23 +1206,33 @@ export default function UserMonthlyCards() {
                   </div>
                 )}
                 <div>
+                  <div className="text-xs text-gray-400 mb-0.5">Ngày bắt đầu</div>
+                  <div className="text-sm font-semibold text-gray-700">
+                    {card.ngayKichHoat}
+                  </div>
+                </div>
+                <div>
                   <div className="text-xs text-gray-400 mb-0.5">
                     Ngày hết hạn
                   </div>
                   <div
-                    className={`text-sm font-semibold ${card.trangThai === "Hết hạn" ? "text-red-600" : card.trangThai === "Sắp hết hạn" ? "text-amber-600" : "text-gray-700"}`}
+                    className={`text-sm font-semibold ${card.trangThai === "Đã hết hạn" ? "text-red-600" : card.trangThai === "Sắp hết hạn" ? "text-amber-600" : "text-gray-700"}`}
                   >
                     {card.ngayHetHan}
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-400 mb-0.5">Còn lại</div>
+                  <div className="text-xs text-gray-400 mb-0.5">
+                    {card.trangThai === "Chưa hoạt động" ? "Thời gian chờ" : "Còn lại"}
+                  </div>
                   <div
-                    className={`text-sm font-semibold ${card.soNgayConLai < 0 ? "text-red-600" : card.soNgayConLai <= 14 ? "text-amber-600" : "text-emerald-600"}`}
+                    className={`text-sm font-semibold ${card.trangThai === "Chưa hoạt động" ? "text-gray-500" : card.trangThai === "Đã hết hạn" ? "text-red-600" : card.soNgayConLai <= 3 ? "text-amber-600" : "text-emerald-600"}`}
                   >
-                    {card.soNgayConLai < 0
-                      ? `Quá ${Math.abs(card.soNgayConLai)} ngày`
-                      : `${card.soNgayConLai} ngày`}
+                    {card.trangThai === "Chưa hoạt động"
+                      ? `Bắt đầu sau ${card.soNgayConLai} ngày`
+                      : card.trangThai === "Đã hết hạn"
+                        ? `Đã hết hạn`
+                        : `Còn ${card.soNgayConLai} ngày`}
                   </div>
                 </div>
               </div>

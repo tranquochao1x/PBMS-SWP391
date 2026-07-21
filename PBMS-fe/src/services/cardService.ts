@@ -10,9 +10,11 @@ export interface MonthlyCardDto {
   loaiXe: string;
   bienSo: string;
   ngayDangKy: string;
+  ngayKichHoat: string;
   ngayHetHan: string;
   tangGuiXe?: string;
-  trangThai: "Hoạt động" | "Hết hạn" | "Sắp hết hạn";
+  status: string;
+  trangThai: "Hoạt động" | "Đã hết hạn" | "Sắp hết hạn" | "Chưa hoạt động";
   soNgayConLai: number;
   checkoutUrl?: string;
   qrCode?: string;
@@ -67,9 +69,12 @@ export interface VehicleRequest {
 export const cardService = {
   async getMyCards(): Promise<MonthlyCardDto[]> {
     const response = await authFetch(`${API_URL}/user/monthly-cards`);
-    const result: ApiResponse<MonthlyCardDto[]> = await safeJson(response);
+    const result: ApiResponse<any[]> = await safeJson(response);
     if (!response.ok) throw new Error(result.message || "Không thể tải danh sách thẻ.");
-    return result.data;
+    return result.data.map(item => ({
+      ...item,
+      ngayKichHoat: item.effectiveFrom || item.effective_from || item.startDate || item.ngayDangKy
+    }));
   },
 
   async registerCard(payload: RegisterCardRequest): Promise<MonthlyCardDto> {
@@ -77,9 +82,12 @@ export const cardService = {
       method: "POST",
       body: JSON.stringify(payload)
     });
-    const result: ApiResponse<MonthlyCardDto> = await safeJson(response);
+    const result: ApiResponse<any> = await safeJson(response);
     if (!response.ok) throw new Error(result.message || "Đăng ký thẻ thất bại.");
-    return result.data;
+    return {
+      ...result.data,
+      ngayKichHoat: result.data.effectiveFrom || result.data.effective_from || result.data.startDate || result.data.ngayDangKy
+    };
   },
 
   async renewCard(payload: RenewCardRequest): Promise<MonthlyCardDto> {
@@ -87,9 +95,12 @@ export const cardService = {
       method: "POST",
       body: JSON.stringify(payload)
     });
-    const result: ApiResponse<MonthlyCardDto> = await safeJson(response);
+    const result: ApiResponse<any> = await safeJson(response);
     if (!response.ok) throw new Error(result.message || "Gia hạn thẻ thất bại.");
-    return result.data;
+    return {
+      ...result.data,
+      ngayKichHoat: result.data.effectiveFrom || result.data.effective_from || result.data.startDate || result.data.ngayDangKy
+    };
   },
 
   async getActiveCardGroups(): Promise<CardGroupDto[]> {
