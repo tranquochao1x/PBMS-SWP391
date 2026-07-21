@@ -99,7 +99,7 @@ function differenceInDays(
   return Math.ceil(
     (parseDateOnly(laterDate).getTime() -
       parseDateOnly(earlierDate).getTime()) /
-      millisecondsPerDay,
+    millisecondsPerDay,
   );
 }
 
@@ -752,7 +752,7 @@ function PaymentQrModal({
                         "vnpay_session",
                         JSON.stringify({ ...s, wasRedirected: true }),
                       );
-                    } catch {}
+                    } catch { }
                   }
                   window.location.href = checkoutUrl;
                 }}
@@ -1106,34 +1106,6 @@ export default function UserMonthlyCards() {
           </div>
         ))}
       </div>
-
-      {/* Banner: Dang cho xac nhan thanh toan (nguoi dung da redirect sang VNPay va quay ve) */}
-      {pendingConfirmation && (
-        <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded px-4 py-3 text-sm text-blue-700">
-          <RefreshCw className="w-4 h-4 animate-spin flex-shrink-0" />
-          <span>
-            <strong>Đang chờ xác nhận thanh toán...</strong> Hệ thống sẽ tự động
-            cập nhật khi VNPay xác nhận giao dịch.
-          </span>
-        </div>
-      )}
-
-      {/* Banner: Thanh toan thanh cong */}
-      {confirmationSuccess && (
-        <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-300 rounded px-4 py-3 text-sm text-emerald-700">
-          <span className="text-xl flex-shrink-0">✅</span>
-          <span>
-            <strong>Thanh toán thành công!</strong> Thẻ của bạn đã được kích
-            hoạt. Danh sách đã được cập nhật.
-          </span>
-          <button
-            onClick={() => setConfirmationSuccess(false)}
-            className="ml-auto text-emerald-500 hover:text-emerald-700 font-bold"
-          >
-            ✕
-          </button>
-        </div>
-      )}
 
       <div className="space-y-3">
         {loading ? (

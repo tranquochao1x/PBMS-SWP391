@@ -1,7 +1,9 @@
 package com.parking.pbms.config;
 
 import com.parking.pbms.model.Account;
+import com.parking.pbms.model.Role;
 import com.parking.pbms.repository.AccountRepository;
+import com.parking.pbms.repository.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,11 +15,13 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initializeAccounts(
             AccountRepository accountRepository,
+            RoleRepository roleRepository,
             PasswordEncoder passwordEncoder
     ) {
         return args -> {
             createAccountIfMissing(
                     accountRepository,
+                    roleRepository,
                     passwordEncoder,
                     "admin",
                     "admin",
@@ -27,6 +31,7 @@ public class DataInitializer {
 
             createAccountIfMissing(
                     accountRepository,
+                    roleRepository,
                     passwordEncoder,
                     "staff01",
                     "staff01",
@@ -36,6 +41,7 @@ public class DataInitializer {
 
             createAccountIfMissing(
                     accountRepository,
+                    roleRepository,
                     passwordEncoder,
                     "staff02",
                     "staff02",
@@ -45,6 +51,7 @@ public class DataInitializer {
 
             createAccountIfMissing(
                     accountRepository,
+                    roleRepository,
                     passwordEncoder,
                     "user01",
                     "user01",
@@ -54,6 +61,7 @@ public class DataInitializer {
 
             createAccountIfMissing(
                     accountRepository,
+                    roleRepository,
                     passwordEncoder,
                     "user02",
                     "user02",
@@ -65,16 +73,26 @@ public class DataInitializer {
 
     private void createAccountIfMissing(
             AccountRepository accountRepository,
+            RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
             String username,
             String rawPassword,
             String fullName,
-            String role
+            String roleName
     ) {
         if (accountRepository
                 .existsByUsernameIgnoreCase(username)) {
             return;
         }
+
+        Role role = roleRepository.findByRoleNameIgnoreCase(roleName)
+                .orElseGet(() -> {
+                    Role newRole = Role.builder()
+                            .roleName(roleName)
+                            .description(roleName + " role")
+                            .build();
+                    return roleRepository.save(newRole);
+                });
 
         Account account = Account.builder()
                 .username(username)
