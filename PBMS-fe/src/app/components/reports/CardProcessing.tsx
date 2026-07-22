@@ -45,6 +45,7 @@ export default function CardProcessing() {
   const [nhomThe, setNhomThe] = useState("");
   const [page, setPage] = useState(1);
   const [cardGroupsList, setCardGroupsList] = useState<string[]>([]);
+  const [usersList, setUsersList] = useState<{username: string; fullName: string}[]>([]);
 
   const fetchHistory = async () => {
     setLoading(true);
@@ -73,6 +74,15 @@ export default function CardProcessing() {
     adminCardService
       .getAllCardGroups()
       .then((groups) => setCardGroupsList(groups.map((g) => g.groupName)))
+      .catch((err) => console.error(err));
+
+    // Load users dynamically for filters
+    adminCardService
+      .getUsers()
+      .then((users) => {
+        const admins = users.filter((u) => u.roleName === "ADMIN");
+        setUsersList(admins.map((u) => ({ username: u.username, fullName: u.fullName })));
+      })
       .catch((err) => console.error(err));
   }, []);
 
@@ -134,36 +144,6 @@ export default function CardProcessing() {
               <option value="">-- Tất cả --</option>
               <option>Thêm thẻ mới</option>
               <option>Gia hạn thẻ</option>
-              <option>Khóa thẻ</option>
-              <option>Mở thẻ</option>
-              <option>Cập nhật biển số</option>
-              <option>Xóa thẻ</option>
-            </select>
-          </FilterGroup>
-          <FilterGroup label="Người dùng">
-            <select
-              className={`${cls.select} w-[110px]`}
-              value={nguoiDung}
-              onChange={(e) => setNguoiDung(e.target.value)}
-            >
-              <option value="">-- Tất cả --</option>
-              <option>admin</option>
-              <option>staff01</option>
-              <option>staff02</option>
-            </select>
-          </FilterGroup>
-          <FilterGroup label="Nhóm thẻ">
-            <select
-              className={`${cls.select} w-[160px]`}
-              value={nhomThe}
-              onChange={(e) => setNhomThe(e.target.value)}
-            >
-              <option value="">-- Tất cả --</option>
-              {cardGroupsList.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
             </select>
           </FilterGroup>
         </div>

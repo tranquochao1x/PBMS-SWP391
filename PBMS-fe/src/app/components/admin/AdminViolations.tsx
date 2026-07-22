@@ -48,6 +48,7 @@ const statusBadge: Record<VStatus, string> = {
   Refunded: cls.badge.green,
   Rejected: cls.badge.gray,
 };
+const SAMPLE: Violation[] = [];
 
 export default function AdminViolations() {
   const [data, setData] = useState<Violation[]>(SAMPLE);
