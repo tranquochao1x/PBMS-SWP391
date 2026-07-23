@@ -21,8 +21,8 @@ import java.util.List;
 public class SlotServiceImpl implements SlotService {
 
     private final FloorRepository floorRepository;
-    private final ParkingSessionRepository parkingSessionRepository;
     private final CardRepository cardRepository;
+    private final ParkingSessionRepository parkingSessionRepository;
 
     @Override
     public SlotStatsResponse getSlotStatistics(String dateStr) {
@@ -37,7 +37,6 @@ public class SlotServiceImpl implements SlotService {
             }
         }
 
-        LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
         List<Floor> floors = floorRepository.findAll();
@@ -60,9 +59,9 @@ public class SlotServiceImpl implements SlotService {
             int floorMonthlyMotorcycle = (int) cardRepository.countActiveMonthlyAndDayCards(floor.getFloorId(), "MOTORCYCLE");
 
             int singleCarInside = (int) parkingSessionRepository.countActiveSingleSessions(
-                    floor.getFloorId(), "CAR", startOfDay, endOfDay);
+                    floor.getFloorId(), "CAR", endOfDay);
             int singleMotorcycleInside = (int) parkingSessionRepository.countActiveSingleSessions(
-                    floor.getFloorId(), "MOTORCYCLE", startOfDay, endOfDay);
+                    floor.getFloorId(), "MOTORCYCLE", endOfDay);
 
             int occupiedCar = floorMonthlyCar + singleCarInside;
             int occupiedMotorcycle = floorMonthlyMotorcycle + singleMotorcycleInside;
@@ -100,6 +99,7 @@ public class SlotServiceImpl implements SlotService {
                 floorStats
         );
     }
+
     @Override
     public void createFloor(com.parking.pbms.dto.FloorRequest request) {
         if (floorRepository.findByFloorCode(request.floorCode()).isPresent()) {
@@ -124,7 +124,6 @@ public class SlotServiceImpl implements SlotService {
         Floor floor = floorRepository.findById(floorId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tầng đỗ xe"));
 
-        // Only update allowed fields
         floor.setFloorName(request.floorName());
         floor.setTotalCarSlots(request.totalCarSlots());
         floor.setTotalMotorcycleSlots(request.totalMotorcycleSlots());

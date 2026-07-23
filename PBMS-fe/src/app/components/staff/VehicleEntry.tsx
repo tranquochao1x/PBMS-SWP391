@@ -245,7 +245,9 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
       );
 
       if (!response.ok) {
-        throw new Error("Không thể kết nối đến Gemini API.");
+        const errText = await response.text();
+        console.error("Gemini API Error:", errText);
+        throw new Error(`Lỗi từ Gemini API (${response.status}): Vui lòng kiểm tra lại API Key.`);
       }
 
       const resData = await response.json();
@@ -430,7 +432,11 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
         },
       );
 
-      if (!response.ok) throw new Error("Lỗi kết nối Gemini API.");
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error("Gemini API Error:", errText);
+        throw new Error(`Lỗi từ Gemini API (${response.status}): Vui lòng kiểm tra lại API Key.`);
+      }
       const resData = await response.json();
       const textResponse = resData.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!textResponse) throw new Error("Không nhận diện được kết quả.");

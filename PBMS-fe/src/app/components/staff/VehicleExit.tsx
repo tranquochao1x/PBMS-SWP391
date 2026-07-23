@@ -214,7 +214,11 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
         },
       );
 
-      if (!response.ok) throw new Error("Không thể kết nối đến Gemini API.");
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error("Gemini API Error:", errText);
+        throw new Error(`Lỗi từ Gemini API (${response.status}): Vui lòng kiểm tra lại API Key.`);
+      }
       const resData = await response.json();
       const text = resData.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("Không có phản hồi từ Gemini API.");
@@ -404,7 +408,11 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
         },
       );
 
-      if (!response.ok) throw new Error("Lỗi kết nối Gemini API.");
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error("Gemini API Error:", errText);
+        throw new Error(`Lỗi từ Gemini API (${response.status}): Vui lòng kiểm tra lại API Key.`);
+      }
       const resData = await response.json();
       const text = resData.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("Không nhận diện được phản hồi.");
