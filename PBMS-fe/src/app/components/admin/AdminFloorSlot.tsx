@@ -4,9 +4,11 @@ import {
   RefreshCw,
   Car,
   Bike,
-  CreditCard,
   AlertTriangle,
   CheckCircle2,
+  Plus,
+  Edit,
+  X,
 } from "lucide-react";
 
 import { cls } from "../common/ui";
@@ -29,6 +31,16 @@ export default function AdminFloorSlot() {
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingFloor, setEditingFloor] = useState<any>(null);
+  const [floorForm, setFloorForm] = useState({
+    floorCode: "",
+    floorName: "",
+    totalCarSlots: 0,
+    totalMotorcycleSlots: 0,
+  });
 
   const fetchStats = async (targetDate: string) => {
     setLoading(true);
@@ -53,6 +65,49 @@ export default function AdminFloorSlot() {
     setTimeout(() => setSuccessMsg(null), 2500);
   };
 
+  const openCreateModal = () => {
+    setEditingFloor(null);
+    setFloorForm({
+      floorCode: "",
+      floorName: "",
+      totalCarSlots: 0,
+      totalMotorcycleSlots: 0,
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (floor: any) => {
+    setEditingFloor(floor);
+    setFloorForm({
+      floorCode: floor.floorCode,
+      floorName: floor.floorName,
+      totalCarSlots: floor.totalCarSlots,
+      totalMotorcycleSlots: floor.totalMotorcycleSlots,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSubmitFloor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      if (editingFloor) {
+        await staffService.updateFloor(editingFloor.floorId, floorForm);
+        setSuccessMsg("Cập nhật thông tin tầng thành công!");
+      } else {
+        await staffService.createFloor(floorForm);
+        setSuccessMsg("Thêm tầng mới thành công!");
+      }
+      setIsModalOpen(false);
+      fetchStats(dateStr);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Đã xảy ra lỗi.");
+      setLoading(false);
+    }
+    setTimeout(() => setSuccessMsg(null), 2500);
+  };
+
   return (
     <div className={`${cls.pageWrapper} px-6 py-4 bg-gray-50/50 min-h-screen`}>
       {/* Breadcrumb */}
@@ -67,11 +122,20 @@ export default function AdminFloorSlot() {
       </div>
 
       {/* Title */}
-      <div className="mb-5 flex items-center gap-2 border-b border-gray-100 pb-3">
-        <Layers className="h-6 w-6 text-blue-600" />
-        <h1 className="text-xl font-bold text-gray-800">
-          Thông tin tầng đỗ xe
-        </h1>
+      <div className="mb-5 flex items-center justify-between border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-2">
+          <Layers className="h-6 w-6 text-blue-600" />
+          <h1 className="text-xl font-bold text-gray-800">
+            Thông tin tầng đỗ xe
+          </h1>
+        </div>
+        <button
+          onClick={openCreateModal}
+          className="flex h-9 items-center gap-2 rounded bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700"
+        >
+          <Plus className="h-4 w-4" />
+          Thêm tầng mới
+        </button>
       </div>
 
       {/* Date Filter Card */}
@@ -167,13 +231,14 @@ export default function AdminFloorSlot() {
                 <th className="px-4 py-3 text-center">Trống ô tô</th>
                 <th className="px-4 py-3 text-center">Tổng slot xe máy</th>
                 <th className="px-4 py-3 text-center">Trống xe máy</th>
+                <th className="px-4 py-3 text-center">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-4 py-12 text-center text-gray-400 text-sm"
                   >
                     <div className="flex justify-center items-center gap-2">
@@ -185,7 +250,7 @@ export default function AdminFloorSlot() {
               ) : !stats || stats.floorStats.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-4 py-12 text-center text-gray-400 text-sm"
                   >
                     Không tìm thấy dữ liệu thống kê nào.
@@ -221,6 +286,15 @@ export default function AdminFloorSlot() {
                         {floor.availableMotorcycleSlots}
                       </span>
                     </td>
+                    <td className="px-4 py-3.5 text-center">
+                      <button
+                        onClick={() => openEditModal(floor)}
+                        className="text-gray-500 hover:text-blue-600 transition p-1"
+                        title="Chỉnh sửa slot"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
@@ -228,6 +302,117 @@ export default function AdminFloorSlot() {
           </table>
         </div>
       </div>
+
+      {/* Modal Add/Edit Floor */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-800">
+                {editingFloor ? "Chỉnh sửa Tầng đỗ xe" : "Thêm Tầng mới"}
+              </h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitFloor} className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-gray-600">
+                  Mã tầng <span className="text-red-500">*</span>
+                </label>
+                <input
+                  required
+                  disabled={Boolean(editingFloor)}
+                  value={floorForm.floorCode}
+                  onChange={(e) =>
+                    setFloorForm({ ...floorForm, floorCode: e.target.value })
+                  }
+                  className={`w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none ${
+                    editingFloor ? "bg-gray-100" : ""
+                  }`}
+                  placeholder="VD: B3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-gray-600">
+                  Tên tầng <span className="text-red-500">*</span>
+                </label>
+                <input
+                  required
+                  value={floorForm.floorName}
+                  onChange={(e) =>
+                    setFloorForm({ ...floorForm, floorName: e.target.value })
+                  }
+                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  placeholder="VD: Tầng hầm B3"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-600">
+                    Slot Ô tô <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={0}
+                    value={floorForm.totalCarSlots}
+                    onChange={(e) =>
+                      setFloorForm({
+                        ...floorForm,
+                        totalCarSlots: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-600">
+                    Slot Xe máy <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={0}
+                    value={floorForm.totalMotorcycleSlots}
+                    onChange={(e) =>
+                      setFloorForm({
+                        ...floorForm,
+                        totalMotorcycleSlots: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="rounded px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-blue-400"
+                >
+                  {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
+                  Lưu thay đổi
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

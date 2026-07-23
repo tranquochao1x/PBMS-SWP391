@@ -14,6 +14,13 @@ export interface FloorDto {
   status: string;
 }
 
+export interface FloorRequest {
+  floorCode: string;
+  floorName: string;
+  totalCarSlots: number;
+  totalMotorcycleSlots: number;
+}
+
 export interface StaffCheckInRequest {
   plateNo: string;
   vehicleType: string;
@@ -324,5 +331,23 @@ export const staffService = {
     const result: ApiResponse<{ plateNumber: string; vehicleType: string; status: string }> = await safeJson(response);
     if (!response.ok) throw new Error(result.message || "Không thể tải thông tin thẻ tháng.");
     return result.data;
+  },
+
+  async createFloor(data: FloorRequest): Promise<void> {
+    const response = await authFetch(`${API_URL}/slots/floors`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    const result: ApiResponse<void> = await safeJson(response);
+    if (!response.ok) throw new Error(result.message || "Lỗi tạo tầng đỗ xe.");
+  },
+
+  async updateFloor(floorId: number, data: FloorRequest): Promise<void> {
+    const response = await authFetch(`${API_URL}/slots/floors/${floorId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    const result: ApiResponse<void> = await safeJson(response);
+    if (!response.ok) throw new Error(result.message || "Lỗi cập nhật tầng đỗ xe.");
   }
 };

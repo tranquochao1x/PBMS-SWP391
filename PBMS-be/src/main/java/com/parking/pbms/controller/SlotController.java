@@ -25,4 +25,27 @@ public class SlotController {
                 ApiResponse.success(200, "Lấy thống kê slot đỗ xe thành công", stats)
         );
     }
+
+    @PostMapping("/floors")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> createFloor(
+            @RequestBody com.parking.pbms.dto.FloorRequest request
+    ) {
+        slotService.createFloor(request);
+        return ResponseEntity.ok(
+                ApiResponse.success(200, "Thêm tầng đỗ xe thành công", null)
+        );
+    }
+
+    @PutMapping("/floors/{floorId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> updateFloor(
+            @PathVariable Integer floorId,
+            @RequestBody com.parking.pbms.dto.FloorRequest request
+    ) {
+        slotService.updateFloor(floorId, request);
+        return ResponseEntity.ok(
+                ApiResponse.success(200, "Cập nhật thông tin tầng đỗ xe thành công", null)
+        );
+    }
 }

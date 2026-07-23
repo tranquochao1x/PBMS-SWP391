@@ -100,4 +100,36 @@ public class SlotServiceImpl implements SlotService {
                 floorStats
         );
     }
+    @Override
+    public void createFloor(com.parking.pbms.dto.FloorRequest request) {
+        if (floorRepository.findByFloorCode(request.floorCode()).isPresent()) {
+            throw new IllegalArgumentException("Mã tầng đã tồn tại");
+        }
+
+        Floor floor = Floor.builder()
+                .floorCode(request.floorCode())
+                .floorName(request.floorName())
+                .vehicleType("BOTH")
+                .totalCarSlots(request.totalCarSlots())
+                .totalMotorcycleSlots(request.totalMotorcycleSlots())
+                .totalSlots(request.totalCarSlots() + request.totalMotorcycleSlots())
+                .status("ACTIVE")
+                .build();
+
+        floorRepository.save(floor);
+    }
+
+    @Override
+    public void updateFloor(Integer floorId, com.parking.pbms.dto.FloorRequest request) {
+        Floor floor = floorRepository.findById(floorId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tầng đỗ xe"));
+
+        // Only update allowed fields
+        floor.setFloorName(request.floorName());
+        floor.setTotalCarSlots(request.totalCarSlots());
+        floor.setTotalMotorcycleSlots(request.totalMotorcycleSlots());
+        floor.setTotalSlots(request.totalCarSlots() + request.totalMotorcycleSlots());
+
+        floorRepository.save(floor);
+    }
 }

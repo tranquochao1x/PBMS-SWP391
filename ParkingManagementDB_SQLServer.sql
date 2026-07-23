@@ -614,25 +614,25 @@ IF NOT EXISTS (SELECT 1 FROM dbo.[User] up JOIN dbo.Accounts a ON a.AccountID = 
     WHERE a.Username = 'user02';
 GO
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '29X1-123.45')
-    INSERT dbo.Vehicles(CustomerID, PlateNo, VehicleType, Brand, Color)
-    SELECT CustomerID, '29X1-123.45', 'MOTORCYCLE', N'Honda', N'Đen' FROM dbo.Customers WHERE Email = 'khoiotaku1907@gmail.com';
+IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '29X112345')
+    INSERT dbo.Vehicles(AccountID, PlateNo, VehicleType, Brand, Color)
+    SELECT AccountID, '29X112345', 'MOTORCYCLE', N'Honda', N'Đen' FROM dbo.Accounts WHERE Username = 'user01';
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '51A-123.45')
-    INSERT dbo.Vehicles(CustomerID, PlateNo, VehicleType, Brand, Color)
-    SELECT CustomerID, '51A-123.45', 'CAR', N'Toyota', N'Trắng' FROM dbo.Customers WHERE Email = 'khoiotaku1907@gmail.com';
+IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '51A12345')
+    INSERT dbo.Vehicles(AccountID, PlateNo, VehicleType, Brand, Color)
+    SELECT AccountID, '51A12345', 'CAR', N'Toyota', N'Trắng' FROM dbo.Accounts WHERE Username = 'user01';
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '43A-999.11')
-    INSERT dbo.Vehicles(CustomerID, PlateNo, VehicleType, Brand, Color)
-    SELECT CustomerID, '43A-999.11', 'MOTORCYCLE', N'Yamaha', N'Xanh' FROM dbo.Customers WHERE Email = 'user02@gmail.com';
+IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '43A99911')
+    INSERT dbo.Vehicles(AccountID, PlateNo, VehicleType, Brand, Color)
+    SELECT AccountID, '43A99911', 'MOTORCYCLE', N'Yamaha', N'Xanh' FROM dbo.Accounts WHERE Username = 'user02';
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '51F-888.88')
-    INSERT dbo.Vehicles(CustomerID, PlateNo, VehicleType, Brand, Color)
-    SELECT CustomerID, '51F-888.88', 'CAR', N'Kia', N'Đen' FROM dbo.Customers WHERE Email = 'user02@gmail.com';
+IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '51F88888')
+    INSERT dbo.Vehicles(AccountID, PlateNo, VehicleType, Brand, Color)
+    SELECT AccountID, '51F88888', 'CAR', N'Kia', N'Đen' FROM dbo.Accounts WHERE Username = 'user02';
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '59A-123.45')
-    INSERT dbo.Vehicles(CustomerID, PlateNo, VehicleType, Brand, Color)
-    SELECT CustomerID, '59A-123.45', 'MOTORCYCLE', N'Honda', N'Đỏ' FROM dbo.Customers WHERE Email = 'levancuong@gmail.com';
+IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles WHERE PlateNo = '59A12345')
+    INSERT dbo.Vehicles(AccountID, PlateNo, VehicleType, Brand, Color)
+    SELECT AccountID, '59A12345', 'MOTORCYCLE', N'Honda', N'Đỏ' FROM dbo.Accounts WHERE Username = 'user01';
 GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Floors WHERE FloorCode = 'B1')

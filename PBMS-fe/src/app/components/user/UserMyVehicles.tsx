@@ -164,9 +164,9 @@ function VehicleFormModal({
                   ? "border-red-400 bg-red-50"
                   : "border-gray-300"
               }`}
-              placeholder="VD: 29X1-12345"
+              placeholder="VD: 29X112345"
               value={form.plateNo}
-              onChange={(e) => F("plateNo", e.target.value.toUpperCase())}
+              onChange={(e) => F("plateNo", e.target.value.replace(/[\s.\-]/g, "").toUpperCase())}
             />
             {fieldErrors.plateNo && (
               <p className="mt-1 text-xs text-red-500">{fieldErrors.plateNo}</p>

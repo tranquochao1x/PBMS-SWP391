@@ -808,7 +808,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                     placeholder="VD: 29A12345"
                     value={inputCode}
                     onChange={(event) =>
-                      setInputCode(event.target.value.toUpperCase())
+                      setInputCode(event.target.value.replace(/[\s.\-]/g, "").toUpperCase())
                     }
                     onKeyDown={(event) => {
                       if (

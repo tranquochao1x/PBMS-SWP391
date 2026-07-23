@@ -138,9 +138,9 @@ export default function AdminAuditLog() {
           </label>
           <input
             className={cls.input}
-            placeholder="VD: 51A-..."
+            placeholder="VD: 51A..."
             value={filterVehicle}
-            onChange={(e) => setFilterVehicle(e.target.value)}
+            onChange={(e) => setFilterVehicle(e.target.value.replace(/[\s.\-]/g, "").toUpperCase())}
           />
         </div>
         <div>

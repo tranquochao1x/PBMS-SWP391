@@ -659,10 +659,10 @@ export default function VehicleEntry({ selectedFloorCode }: VehicleEntryProps) {
                   type="text"
                   disabled={Boolean(ticket)}
                   className="h-[38px] flex-1 rounded border border-gray-300 px-3 text-sm font-bold uppercase tracking-wider outline-none transition focus:border-blue-400 focus:ring-1 focus:ring-blue-100 disabled:bg-gray-100"
-                  placeholder="VD: 29A-123.45"
+                  placeholder="VD: 29A12345"
                   value={bienSo}
                   onChange={(e) => {
-                    setBienSo(e.target.value);
+                    setBienSo(e.target.value.replace(/[\s.\-]/g, "").toUpperCase());
                     setErrorMsg(null);
                   }}
                 />
