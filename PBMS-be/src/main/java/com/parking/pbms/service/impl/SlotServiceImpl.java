@@ -63,8 +63,13 @@ public class SlotServiceImpl implements SlotService {
             int singleMotorcycleInside = (int) parkingSessionRepository.countActiveSingleSessions(
                     floor.getFloorId(), "MOTORCYCLE", endOfDay);
 
-            int occupiedCar = floorMonthlyCar + singleCarInside;
-            int occupiedMotorcycle = floorMonthlyMotorcycle + singleMotorcycleInside;
+            int expiredCardCarInside = (int) parkingSessionRepository.countExpiredCardSessionsInside(
+                    floor.getFloorId(), "CAR", endOfDay);
+            int expiredCardMotorcycleInside = (int) parkingSessionRepository.countExpiredCardSessionsInside(
+                    floor.getFloorId(), "MOTORCYCLE", endOfDay);
+
+            int occupiedCar = floorMonthlyCar + singleCarInside + expiredCardCarInside;
+            int occupiedMotorcycle = floorMonthlyMotorcycle + singleMotorcycleInside + expiredCardMotorcycleInside;
 
             int availableCar = Math.max(0, floorTotalCarSlots - occupiedCar);
             int availableMotorcycle = Math.max(0, floorTotalMotorcycleSlots - occupiedMotorcycle);

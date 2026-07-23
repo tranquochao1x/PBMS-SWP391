@@ -95,9 +95,10 @@ public class UserCardServiceImpl implements UserCardService {
         LocalDate startDate = request.startDate() != null ? request.startDate() : LocalDate.now();
         LocalDate expireAt;
         if (cardGroup.getTicketType().equalsIgnoreCase("DAY")) {
-            expireAt = startDate.plusDays(request.duration());
+            expireAt = startDate.plusDays(Math.max(0, request.duration() - 1));
         } else {
-            expireAt = startDate.plusMonths(request.duration());
+            // Thẻ tháng: cộng số tháng và trừ đi 1 ngày (VD: 24/07 -> 23/08)
+            expireAt = startDate.plusMonths(request.duration()).minusDays(1);
         }
 
         // Create Card
@@ -183,13 +184,18 @@ public class UserCardServiceImpl implements UserCardService {
         LocalDate oldExpiry = card.getExpireAt();
         LocalDate today = LocalDate.now();
 
-        // Tính ngày hết hạn mới dựa trên trạng thái thẻ hiện tại trong DB:
-        // - Nếu thẻ đã hết hạn (ExpireAt < ngày hiện tại): cộng từ hôm nay
-        // - Nếu thẻ còn hiệu lực: cộng dồn từ ngày hết hạn cũ
         boolean isExpired = (oldExpiry == null || oldExpiry.isBefore(today));
-        LocalDate newExpiry = isExpired
-                ? today.plusMonths(request.duration())
-                : oldExpiry.plusMonths(request.duration());
+        LocalDate newExpiry;
+        
+        if (cardGroup.getTicketType().equalsIgnoreCase("DAY")) {
+            newExpiry = isExpired 
+                    ? today.plusDays(Math.max(0, request.duration() - 1))
+                    : oldExpiry.plusDays(request.duration());
+        } else {
+            newExpiry = isExpired 
+                    ? today.plusMonths(request.duration()).minusDays(1)
+                    : oldExpiry.plusMonths(request.duration());
+        }
 
         // GIỮ NGUYÊN bảng Cards (TUYỆT ĐỐI KHÔNG cập nhật ExpireAt hay Status của Cards ở bước này)
         // Việc cập nhật chỉ được thực hiện khi thanh toán VNPay thành công (ResponseCode = 00)

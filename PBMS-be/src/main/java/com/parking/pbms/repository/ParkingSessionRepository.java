@@ -59,4 +59,18 @@ public interface ParkingSessionRepository extends JpaRepository<ParkingSession, 
             @Param("vehicleType") String vehicleType,
             @Param("endOfDay") LocalDateTime endOfDay
     );
+
+    @Query("SELECT COUNT(t) FROM ParkingSession t JOIN Card c ON t.cardId = c.cardId WHERE " +
+           "t.vehicleType = :vehicleType AND " +
+           "t.ticketType IN ('DAY', 'MONTHLY') AND " +
+           "t.entryFloorId = :floorId AND " +
+           "t.checkInAt <= :endOfDay AND " +
+           "(t.checkOutAt IS NULL OR t.checkOutAt > :endOfDay) AND " +
+           "t.status <> 'CANCELLED' AND " +
+           "c.status = 'EXPIRED'")
+    long countExpiredCardSessionsInside(
+            @Param("floorId") Integer floorId,
+            @Param("vehicleType") String vehicleType,
+            @Param("endOfDay") LocalDateTime endOfDay
+    );
 }
