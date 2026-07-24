@@ -57,6 +57,7 @@ interface VehicleExitProps {
 
 export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
   const [inputCode, setInputCode] = useState("");
+  const [isLostCard, setIsLostCard] = useState(false);
   const [ticket, setTicket] = useState<TicketInfo | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -307,7 +308,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
     }
 
     try {
-      const resp = await staffService.previewCheckOut(code.trim());
+      const resp = await staffService.previewCheckOut(code.trim(), isLostCard);
 
       const ticketInfo: TicketInfo = {
         parkingSessionId: resp.parkingSessionId,
@@ -334,8 +335,13 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
       setConfirmed(false);
 
       // Proceed to Step 2
-      setCheckoutStep("exit-plate");
-      setExitPlateInput(""); // Reset exit plate input field
+      if (isLostCard) {
+        setCheckoutStep("compare");
+        setPlateMatchConfirmed(true);
+      } else {
+        setCheckoutStep("exit-plate");
+        setExitPlateInput(""); // Reset exit plate input field
+      }
     } catch (err: any) {
       setTicket(null);
       setNotFound(true);
@@ -352,6 +358,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
         floorCode: floorCode,
         exitImage: exitImage || undefined,
         exitPlate: exitPlate || undefined,
+        isLostCard: isLostCard,
       });
       setConfirmed(true);
       try {
@@ -373,6 +380,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
     setExitPlateInput("");
     setPlateMatchConfirmed(false);
     setCheckoutStep("barcode");
+    setIsLostCard(false);
     stopExitCamera();
   };
 
@@ -439,6 +447,20 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                       Tìm vé
                     </button>
                   </div>
+
+                  <label className="flex items-center gap-2 mt-2 text-xs font-semibold text-red-600 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={isLostCard}
+                      disabled={checkoutStep !== "barcode"}
+                      onChange={(e) => {
+                        setIsLostCard(e.target.checked);
+                        setErrorMsg(null);
+                      }}
+                      className="rounded border-gray-300 text-red-650 focus:ring-red-500 h-4 w-4 cursor-pointer"
+                    />
+                    <span>Báo mất thẻ xe (+100.000 VNĐ)</span>
+                  </label>
                 </div>
 
               </div>
@@ -446,7 +468,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
           )}
 
           {/* Step 2: Exit Plate Scan */}
-          {(checkoutStep === "exit-plate" ||
+          {!isLostCard && (checkoutStep === "exit-plate" ||
             checkoutStep === "compare") && (
             <div>
               <div className="flex items-center gap-2 bg-blue-600 px-4 py-2.5">
@@ -459,7 +481,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
               <div className="p-4 space-y-4">
                 <div className="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
                   🏷️ Đã tìm thấy vé:{" "}
-                  <span className="font-bold">{ticket?.maVe}</span> (Biển số
+                  <span className="font-bold">{ticket?.qrPayload || ticket?.maVe}</span> (Biển số
                   vào: <span className="font-bold">{ticket?.bienSo}</span>). Vui
                   lòng quét hoặc nhập biển số lúc ra để đối chiếu.
                 </div>
@@ -701,7 +723,19 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                   </div>
                 </div>
 
-                {plateMatchConfirmed ? (
+                {isLostCard ? (
+                  <div className="w-full rounded-lg border border-red-200 bg-red-50 px-4 py-3 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
+                    <div>
+                      <p className="text-xs font-bold text-red-700">
+                        Trạng thái: Báo mất thẻ xe
+                      </p>
+                      <p className="text-[11px] text-red-650">
+                        Đã bỏ qua đối chiếu biển số ra do báo mất thẻ. Thu phí phạt làm lại thẻ 100.000 VNĐ.
+                      </p>
+                    </div>
+                  </div>
+                ) : plateMatchConfirmed ? (
                   <div className="w-full rounded-lg border border-green-200 bg-green-50 px-4 py-3 flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-green-600" />
                     <div>
@@ -751,16 +785,18 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                 )}
 
                 <div className="pt-2 flex justify-between">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCheckoutStep("exit-plate");
-                      setErrorMsg(null);
-                    }}
-                    className="text-xs text-blue-600 hover:underline"
-                  >
-                    Quay lại bước 2
-                  </button>
+                  {!isLostCard && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCheckoutStep("exit-plate");
+                        setErrorMsg(null);
+                      }}
+                      className="text-xs text-blue-600 hover:underline"
+                    >
+                      Quay lại bước 2
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={handleCancel}
@@ -833,7 +869,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                     Mã vé (Barcode):
                   </span>
                   <span className="text-right text-gray-800 font-bold">
-                    {ticket.maVe}
+                    {ticket.qrPayload || ticket.maVe}
                   </span>
                 </div>
                 <div className="grid grid-cols-[120px_1fr] gap-2 text-xs leading-6 border-b border-gray-100 py-1">
@@ -954,7 +990,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
             executeFinalCheckOut();
           }}
           parkingSessionId={ticket.parkingSessionId}
-          parkingSessionNo={ticket.maVe}
+          parkingSessionNo={ticket.qrPayload || ticket.maVe}
           plateNo={ticket.bienSo}
           vehicleType={ticket.vehicleType}
           checkInAt={ticket.rawCheckInAt}

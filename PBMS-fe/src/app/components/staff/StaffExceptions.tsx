@@ -746,7 +746,7 @@ export default function StaffExceptions() {
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input type="checkbox" className="mt-1 w-4 h-4 text-red-600 rounded focus:ring-red-500" checked={lostForm.confirmed} onChange={e => setLostForm({...lostForm, confirmed: e.target.checked})} />
                     <span className="text-sm text-gray-800 leading-relaxed font-medium">
-                      Thẻ xe của tôi đã bị thất lạc và hiện không thể tìm thấy. Tôi xác nhận các thông tin đã khai trên là đúng sự thật và đồng ý thực hiện đầy đủ các quy định của Ban Quản lý, bao gồm việc nộp phí 100.000 VNĐ để Ban Quản Lý làm lại thẻ đã mất.
+                      Thẻ xe của quý khách đã bị thất lạc và hiện không thể tìm thấy. Tôi xác nhận các thông tin đã khai trên là đúng sự thật và khách hàng đồng ý thực hiện đầy đủ các quy định của Ban Quản lý, bao gồm việc nộp phí 100.000 VNĐ để Ban Quản Lý làm lại thẻ đã mất.
                     </span>
                   </label>
                   

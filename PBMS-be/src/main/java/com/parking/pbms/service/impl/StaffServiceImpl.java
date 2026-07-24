@@ -337,7 +337,7 @@ public class StaffServiceImpl implements StaffService {
         }
 
         // Validate exit license plate against entry license plate snapshot
-        if (request.exitPlate() != null && !request.exitPlate().trim().isEmpty()) {
+        if (!Boolean.TRUE.equals(request.isLostCard()) && request.exitPlate() != null && !request.exitPlate().trim().isEmpty()) {
             String entryPlateClean = ticket.getPlateNoSnapshot().trim().toUpperCase().replaceAll("[^A-Z0-9]", "");
             String exitPlateClean = request.exitPlate().trim().toUpperCase().replaceAll("[^A-Z0-9]", "");
             if (!entryPlateClean.equals(exitPlateClean)) {
@@ -405,6 +405,16 @@ public class StaffServiceImpl implements StaffService {
             }
         }
 
+        // Add 100,000 VND fee if card is lost
+        if (Boolean.TRUE.equals(request.isLostCard())) {
+            fee = fee.add(new BigDecimal("100000"));
+            if (violationReason == null) {
+                violationReason = "Mất thẻ xe (Làm lại thẻ)";
+            } else {
+                violationReason += " - Mất thẻ xe (Làm lại thẻ)";
+            }
+        }
+
         // Update Ticket
         ticket.setCheckOutAt(checkOutTime);
         ticket.setExitStaffId(staff.getStaffId());
@@ -466,7 +476,7 @@ public class StaffServiceImpl implements StaffService {
 
     @Override
     @Transactional
-    public StaffTicketResponse previewCheckOut(String parkingSessionNoOrQrToken, String username) {
+    public StaffTicketResponse previewCheckOut(String parkingSessionNoOrQrToken, Boolean isLostCard, String username) {
         // Find staff
         Account account = accountRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản: " + username));
@@ -573,6 +583,16 @@ public class StaffServiceImpl implements StaffService {
                         }
                     }
                 }
+            }
+        }
+
+        // Add 100,000 VND fee if card is lost
+        if (Boolean.TRUE.equals(isLostCard)) {
+            fee = fee.add(new BigDecimal("100000"));
+            if (violationReason == null) {
+                violationReason = "Mất thẻ xe (Làm lại thẻ)";
+            } else {
+                violationReason += " - Mất thẻ xe (Làm lại thẻ)";
             }
         }
 

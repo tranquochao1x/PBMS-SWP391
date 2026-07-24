@@ -11,6 +11,8 @@ public record StaffCheckOutRequest(
 
         String exitImage,
 
-        String exitPlate
+        String exitPlate,
+
+        Boolean isLostCard
 ) {}
 
