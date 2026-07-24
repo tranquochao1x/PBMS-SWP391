@@ -30,4 +30,6 @@ public interface StaffAssignmentRepository extends JpaRepository<StaffAssignment
             Integer shiftId,
             String status
     );
+
+    boolean existsByFloorId(Integer floorId);
 }

@@ -82,6 +82,16 @@ public class UserCardServiceImpl implements UserCardService {
             String floorCode = request.tangGuiXe().replace("Tầng ", "").replace("Tầng hầm ", "").trim();
             Floor floor = floorRepository.findByFloorCode(floorCode).orElse(null);
             if (floor != null) {
+                String requiredVehicleType = cardGroup.getVehicleType().toUpperCase();
+                if ("CAR".equals(requiredVehicleType)) {
+                    if (floor.getTotalCarSlots() == null || floor.getTotalCarSlots() <= 0) {
+                        throw new IllegalArgumentException("Tầng " + floor.getFloorCode() + " không hỗ trợ đăng ký thẻ cho xe ô tô (số slot xe ô tô bằng 0).");
+                    }
+                } else if ("MOTORCYCLE".equals(requiredVehicleType)) {
+                    if (floor.getTotalMotorcycleSlots() == null || floor.getTotalMotorcycleSlots() <= 0) {
+                        throw new IllegalArgumentException("Tầng " + floor.getFloorCode() + " không hỗ trợ đăng ký thẻ cho xe máy (số slot xe máy bằng 0).");
+                    }
+                }
                 preferredFloorId = floor.getFloorId();
             }
         }
@@ -294,7 +304,7 @@ public class UserCardServiceImpl implements UserCardService {
         String nhomThe = group != null ? group.getGroupName() : "";
         String loaiXe = group != null ? (group.getVehicleType().equalsIgnoreCase("MOTORCYCLE") ? "Xe máy" : "Ô tô") : "";
         String bienSo = vehicle != null ? vehicle.getPlateNo() : "";
-        String tangGuiXe = floor != null ? floor.getFloorCode() : null;
+        String tangGuiXe = floor != null ? (floor.getFloorCode().equals("B1") ? "Tầng B1" : floor.getFloorCode().equals("B2") ? "Tầng B2" : floor.getFloorName()) : null;
 
         // Calculate remaining days
         int remainingDays = 0;

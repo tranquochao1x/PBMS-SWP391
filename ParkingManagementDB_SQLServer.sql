@@ -236,6 +236,27 @@ BEGIN
 END;
 GO
 
+IF OBJECT_ID(N'dbo.ViolationRules', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.ViolationRules (
+        RuleID              VARCHAR(50) PRIMARY KEY,
+        RuleName            NVARCHAR(100) NOT NULL,
+        TicketType          VARCHAR(20) NOT NULL,
+        VehicleType         VARCHAR(20) NOT NULL,
+        MaxDurationHours    INT NOT NULL CONSTRAINT DF_ViolationRules_MaxDuration DEFAULT 0,
+        PenaltyPerHour      DECIMAL(18,2) NOT NULL CONSTRAINT DF_ViolationRules_Penalty DEFAULT 0,
+        Description         NVARCHAR(500) NOT NULL,
+        IsActive            BIT NOT NULL CONSTRAINT DF_ViolationRules_IsActive DEFAULT 1,
+        CreatedAt           DATETIME2(0) NOT NULL CONSTRAINT DF_ViolationRules_CreatedAt DEFAULT SYSDATETIME(),
+        UpdatedAt           DATETIME2(0) NOT NULL CONSTRAINT DF_ViolationRules_UpdatedAt DEFAULT SYSDATETIME(),
+        CONSTRAINT CK_ViolationRules_TicketType CHECK (TicketType IN ('SINGLE', 'DAY', 'MONTHLY')),
+        CONSTRAINT CK_ViolationRules_VehicleType CHECK (ViolationRules.VehicleType IN ('MOTORCYCLE', 'CAR')),
+        CONSTRAINT CK_ViolationRules_Duration CHECK (MaxDurationHours >= 0),
+        CONSTRAINT CK_ViolationRules_Penalty CHECK (PenaltyPerHour >= 0)
+    );
+END;
+GO
+
 IF OBJECT_ID(N'dbo.Cards', N'U') IS NULL
 BEGIN
     CREATE TABLE dbo.Cards (
@@ -318,10 +339,11 @@ BEGIN
     CREATE TABLE dbo.ParkingSessions (
         ParkingSessionID     BIGINT IDENTITY(1,1) PRIMARY KEY,
         ParkingSessionNo     AS ('PSN' + RIGHT('000000' + CONVERT(VARCHAR(20), ParkingSessionID), 6)) PERSISTED,
-        Barcode              VARCHAR(500) NOT NULL,
+        Barcode              VARCHAR(50) NOT NULL,
         CardID               INT NULL,
         VehicleID            INT NULL,
         ReservationID        BIGINT NULL,
+        RuleID               VARCHAR(50) NULL,
         TicketType           VARCHAR(20) NOT NULL,
         VehicleType          VARCHAR(20) NOT NULL,
         PlateNoSnapshot      VARCHAR(20) NOT NULL,
@@ -347,6 +369,8 @@ BEGIN
         CONSTRAINT FK_ParkingSessions_Floor FOREIGN KEY (EntryFloorID) REFERENCES dbo.Floors(FloorID),
         CONSTRAINT FK_ParkingSessions_EntryStaff FOREIGN KEY (EntryStaffID) REFERENCES dbo.Staff(StaffID),
         CONSTRAINT FK_ParkingSessions_ExitStaff FOREIGN KEY (ExitStaffID) REFERENCES dbo.Staff(StaffID),
+        CONSTRAINT FK_ParkingSessions_BarcodeCards FOREIGN KEY (Barcode) REFERENCES dbo.BarcodeCards(Barcode),
+        CONSTRAINT FK_ParkingSessions_ViolationRules FOREIGN KEY (RuleID) REFERENCES dbo.ViolationRules(RuleID),
         CONSTRAINT CK_ParkingSessions_TicketType CHECK (TicketType IN ('SINGLE', 'DAY', 'MONTHLY')),
         CONSTRAINT CK_ParkingSessions_VehicleType CHECK (VehicleType IN ('MOTORCYCLE', 'CAR')),
         CONSTRAINT CK_ParkingSessions_Status CHECK (Status IN ('ACTIVE', 'PAID', 'COMPLETED', 'CANCELLED', 'LOST')),
@@ -461,26 +485,7 @@ BEGIN
 END;
 GO
 
-IF OBJECT_ID(N'dbo.ViolationRules', N'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.ViolationRules (
-        RuleID              VARCHAR(50) PRIMARY KEY,
-        RuleName            NVARCHAR(100) NOT NULL,
-        TicketType          VARCHAR(20) NOT NULL,
-        VehicleType         VARCHAR(20) NOT NULL,
-        MaxDurationHours    INT NOT NULL CONSTRAINT DF_ViolationRules_MaxDuration DEFAULT 0,
-        PenaltyPerHour      DECIMAL(18,2) NOT NULL CONSTRAINT DF_ViolationRules_Penalty DEFAULT 0,
-        Description         NVARCHAR(500) NOT NULL,
-        IsActive            BIT NOT NULL CONSTRAINT DF_ViolationRules_IsActive DEFAULT 1,
-        CreatedAt           DATETIME2(0) NOT NULL CONSTRAINT DF_ViolationRules_CreatedAt DEFAULT SYSDATETIME(),
-        UpdatedAt           DATETIME2(0) NOT NULL CONSTRAINT DF_ViolationRules_UpdatedAt DEFAULT SYSDATETIME(),
-        CONSTRAINT CK_ViolationRules_TicketType CHECK (TicketType IN ('SINGLE', 'DAY', 'MONTHLY')),
-        CONSTRAINT CK_ViolationRules_VehicleType CHECK (ViolationRules.VehicleType IN ('MOTORCYCLE', 'CAR')),
-        CONSTRAINT CK_ViolationRules_Duration CHECK (MaxDurationHours >= 0),
-        CONSTRAINT CK_ViolationRules_Penalty CHECK (PenaltyPerHour >= 0)
-    );
-END;
-GO
+
 
 /* ================================================================
    10. INDEXES

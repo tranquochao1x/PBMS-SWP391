@@ -287,7 +287,7 @@ export default function AdminFloorSlot() {
                   >
                     {/* Tầng */}
                     <td className="px-4 py-3.5 text-sm font-extrabold text-blue-600 whitespace-nowrap">
-                      {floor.floorCode}
+                      {floor.floorName}
                     </td>
                     {/* Tổng slot ô tô */}
                     <td className="px-4 py-3.5 text-center text-sm font-semibold text-gray-700">

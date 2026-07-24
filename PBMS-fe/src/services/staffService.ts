@@ -10,6 +10,8 @@ export interface FloorDto {
   floorName: string;
   vehicleType: string;
   totalSlots: number;
+  totalCarSlots: number;
+  totalMotorcycleSlots: number;
   note?: string;
   status: string;
 }

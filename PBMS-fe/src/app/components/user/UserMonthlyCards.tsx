@@ -273,6 +273,24 @@ function AddCardModal({
       setErr("Vui lòng chọn ngày bắt đầu (*)");
       return;
     }
+
+    // Validate floor compatibility and slots count
+    const selectedFloor = activeFloors.find(f => f.floorCode === form.tangGuiXe);
+    if (selectedFloor) {
+      const requiredVehicleType = selectedGroup?.vehicleType ?? "MOTORCYCLE";
+      if (requiredVehicleType === "CAR") {
+        if (!selectedFloor.totalCarSlots || selectedFloor.totalCarSlots <= 0) {
+          setErr(`Tầng ${selectedFloor.floorCode} không hỗ trợ đăng ký thẻ cho xe ô tô (số slot xe ô tô bằng 0).`);
+          return;
+        }
+      } else if (requiredVehicleType === "MOTORCYCLE") {
+        if (!selectedFloor.totalMotorcycleSlots || selectedFloor.totalMotorcycleSlots <= 0) {
+          setErr(`Tầng ${selectedFloor.floorCode} không hỗ trợ đăng ký thẻ cho xe máy (số slot xe máy bằng 0).`);
+          return;
+        }
+      }
+    }
+
     const data = {
       ...form,
       loaiXe,

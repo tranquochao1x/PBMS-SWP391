@@ -8,6 +8,8 @@ import com.parking.pbms.repository.FloorRepository;
 import com.parking.pbms.repository.ParkingSessionRepository;
 import com.parking.pbms.repository.ReservationRepository;
 import com.parking.pbms.service.SlotService;
+import com.parking.pbms.repository.StaffAssignmentRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ public class SlotServiceImpl implements SlotService {
     private final CardRepository cardRepository;
     private final ParkingSessionRepository parkingSessionRepository;
     private final ReservationRepository reservationRepository;
+    private final StaffAssignmentRepository staffAssignmentRepository;
 
     @Override
     public SlotStatsResponse getSlotStatistics(String dateStr) {
@@ -156,9 +159,17 @@ public class SlotServiceImpl implements SlotService {
         Floor floor = floorRepository.findById(floorId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tầng đỗ xe"));
 
-        if (parkingSessionRepository.existsByEntryFloorId(floorId) ||
-            reservationRepository.existsByFloorId(floorId)) {
-            throw new IllegalArgumentException("Không thể xóa tầng này vì đã có dữ liệu đặt vé hoặc ra vào.");
+        if (parkingSessionRepository.existsByEntryFloorId(floorId)) {
+            throw new IllegalArgumentException("Không thể xóa tầng này vì đã có dữ liệu ra vào (check-in/check-out).");
+        }
+        if (reservationRepository.existsByFloorId(floorId)) {
+            throw new IllegalArgumentException("Không thể xóa tầng này vì đã có lượt đặt vé đỗ xe.");
+        }
+        if (staffAssignmentRepository.existsByFloorId(floorId)) {
+            throw new IllegalArgumentException("Không thể xóa tầng này vì đã có dữ liệu phân công công việc của nhân viên.");
+        }
+        if (cardRepository.existsByPreferredFloorID(floorId)) {
+            throw new IllegalArgumentException("Không thể xóa tầng này vì đã có thẻ tháng đăng ký sử dụng tầng này.");
         }
 
         floorRepository.delete(floor);

@@ -70,6 +70,9 @@ public class ParkingSession {
     @Column(name = "PenaltyAmount", nullable = false)
     private BigDecimal penaltyAmount;
 
+    @Column(name = "RuleID", length = 50)
+    private String ruleId;
+
     @Column(name = "ViolationReason", length = 500)
     private String violationReason;
 

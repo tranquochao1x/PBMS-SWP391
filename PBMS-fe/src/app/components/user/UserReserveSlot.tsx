@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getLocalTodayStr } from "../../../utils/dateUtils";
 import { Calendar, CheckCircle, Car } from "lucide-react";
 import { cls } from "../common/ui";
-import { staffService } from "../../../services/staffService";
 
 type SlotStatus =
   "available" | "reserved" | "occupied" | "disabled" | "selected";
@@ -63,14 +62,6 @@ export default function UserReserveSlot() {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
-
-  const [activeFloors, setActiveFloors] = useState<{floorCode: string, floorName: string}[]>([]);
-  useEffect(() => {
-    staffService
-      .getFloors()
-      .then((data) => setActiveFloors(data.filter((f) => f.status === "ACTIVE")))
-      .catch(() => setActiveFloors([]));
-  }, []);
 
   const card = MONTHLY_CARDS.find((c) => c.id === cardId);
   const slots = buildSlots(floor, zone);
@@ -248,9 +239,8 @@ export default function UserReserveSlot() {
                 }}
               >
                 <option value="">-- Chọn --</option>
-                {activeFloors.map((f) => (
-                  <option key={f.floorCode} value={f.floorCode}>{f.floorCode}</option>
-                ))}
+                <option value="B1">B1</option>
+                <option value="B2">B2</option>
               </select>
             </div>
             <div>

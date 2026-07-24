@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   LifeBuoy,
   Search,
@@ -12,7 +12,6 @@ import {
   Calendar,
 } from "lucide-react";
 import { cls } from "../common/ui";
-import { adminCardService } from "../../../services/adminCardService";
 
 type SupportStatus = "Chờ xử lý" | "Đang xử lý" | "Đã giải quyết" | "Từ chối";
 
@@ -39,17 +38,15 @@ const STATUS_BADGE: Record<SupportStatus, string> = {
   "Từ chối": "bg-red-100 text-red-700 border border-red-200",
 };
 
-
+const STAFF_LIST = ["staff01", "staff02", "staff03"];
 
 /* ─── Detail / Reply Modal ─────────────────────────────────────────── */
 function TicketModal({
   ticket,
-  staffList,
   onClose,
   onUpdate,
 }: {
   ticket: SupportTicket;
-  staffList: string[];
   onClose: () => void;
   onUpdate: (id: string, changes: Partial<SupportTicket>) => void;
 }) {
@@ -152,7 +149,7 @@ function TicketModal({
                 onChange={(e) => setAssigned(e.target.value)}
               >
                 <option value="">-- Chưa giao --</option>
-                {staffList.map((s) => (
+                {STAFF_LIST.map((s) => (
                   <option key={s}>{s}</option>
                 ))}
               </select>
@@ -207,19 +204,6 @@ export default function AdminSupport() {
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(
     null,
   );
-  const [staffList, setStaffList] = useState<string[]>([]);
-
-  useEffect(() => {
-    adminCardService
-      .getUsers()
-      .then((users) => {
-        const staffUsers = users
-          .filter((u) => u.roleName?.toUpperCase() === "STAFF" && u.status === "ACTIVE")
-          .map((u) => u.username);
-        setStaffList(staffUsers);
-      })
-      .catch(() => setStaffList([]));
-  }, []);
 
   const handleUpdate = (id: string, changes: Partial<SupportTicket>) => {
     setTickets((prev) =>
@@ -452,7 +436,6 @@ export default function AdminSupport() {
       {selectedTicket && (
         <TicketModal
           ticket={selectedTicket}
-          staffList={staffList}
           onClose={() => setSelectedTicket(null)}
           onUpdate={handleUpdate}
         />

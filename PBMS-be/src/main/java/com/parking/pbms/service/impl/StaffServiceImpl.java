@@ -54,6 +54,24 @@ public class StaffServiceImpl implements StaffService {
         String plateNo = request.plateNo().trim().toUpperCase();
         String vehicleType = request.vehicleType().trim().toUpperCase();
 
+        if ("CAR".equals(vehicleType)) {
+            if (floor.getTotalCarSlots() == null || floor.getTotalCarSlots() <= 0) {
+                throw new RuntimeException("Tầng " + floor.getFloorCode() + " không hỗ trợ đỗ xe ô tô (số slot bằng 0).");
+            }
+            long activeCars = ParkingSessionRepository.countByEntryFloorIdAndVehicleTypeAndStatus(floor.getFloorId(), "CAR", "ACTIVE");
+            if (activeCars >= floor.getTotalCarSlots()) {
+                throw new RuntimeException("Tầng " + floor.getFloorCode() + " đã hết chỗ đỗ cho xe ô tô.");
+            }
+        } else if ("MOTORCYCLE".equals(vehicleType)) {
+            if (floor.getTotalMotorcycleSlots() == null || floor.getTotalMotorcycleSlots() <= 0) {
+                throw new RuntimeException("Tầng " + floor.getFloorCode() + " không hỗ trợ đỗ xe máy (số slot bằng 0).");
+            }
+            long activeMotorcycles = ParkingSessionRepository.countByEntryFloorIdAndVehicleTypeAndStatus(floor.getFloorId(), "MOTORCYCLE", "ACTIVE");
+            if (activeMotorcycles >= floor.getTotalMotorcycleSlots()) {
+                throw new RuntimeException("Tầng " + floor.getFloorCode() + " đã hết chỗ đỗ cho xe máy.");
+            }
+        }
+
         // Always validate cardBarcode for all check-ins (visitor & pre-booked)
         String cardBarcode = request.cardBarcode();
         if (cardBarcode == null || cardBarcode.trim().length() != 10) {
@@ -357,6 +375,7 @@ public class StaffServiceImpl implements StaffService {
                     penalty = rule.getPenaltyPerHour().multiply(BigDecimal.valueOf(overdueHours));
                     fee = fee.add(penalty);
                     violationReason = "Đỗ quá giờ cho phép (quá " + rule.getMaxDurationHours() + "h) - quá hạn " + overdueHours + " giờ";
+                    ticket.setRuleId(rule.getRuleId());
                 }
             }
         } else if ("DAY".equalsIgnoreCase(ticketType) || "MONTHLY".equalsIgnoreCase(ticketType)) {
@@ -377,6 +396,7 @@ public class StaffServiceImpl implements StaffService {
                                     fee = penalty; // Chỉ thu tiền phạt vì phí thẻ đã mua trước
                                     violationReason = "Thẻ " + ("DAY".equalsIgnoreCase(ticketType) ? "ngày" : "tháng") 
                                             + " hết hạn tại thời điểm check-out - quá hạn " + overdueHours + " giờ";
+                                    ticket.setRuleId(rule.getRuleId());
                                 }
                             }
                         }
@@ -526,6 +546,7 @@ public class StaffServiceImpl implements StaffService {
                     penalty = rule.getPenaltyPerHour().multiply(BigDecimal.valueOf(overdueHours));
                     fee = fee.add(penalty);
                     violationReason = "Đỗ quá giờ cho phép (quá " + rule.getMaxDurationHours() + "h) - quá hạn " + overdueHours + " giờ";
+                    ticket.setRuleId(rule.getRuleId());
                 }
             }
         } else if ("DAY".equalsIgnoreCase(ticketType) || "MONTHLY".equalsIgnoreCase(ticketType)) {
@@ -546,6 +567,7 @@ public class StaffServiceImpl implements StaffService {
                                     fee = penalty;
                                     violationReason = "Thẻ " + ("DAY".equalsIgnoreCase(ticketType) ? "ngày" : "tháng") 
                                             + " hết hạn tại thời điểm check-out - quá hạn " + overdueHours + " giờ";
+                                    ticket.setRuleId(rule.getRuleId());
                                 }
                             }
                         }
