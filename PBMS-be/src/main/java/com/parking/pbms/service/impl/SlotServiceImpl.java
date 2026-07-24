@@ -6,6 +6,7 @@ import com.parking.pbms.model.Floor;
 import com.parking.pbms.repository.CardRepository;
 import com.parking.pbms.repository.FloorRepository;
 import com.parking.pbms.repository.ParkingSessionRepository;
+import com.parking.pbms.repository.ReservationRepository;
 import com.parking.pbms.service.SlotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class SlotServiceImpl implements SlotService {
     private final FloorRepository floorRepository;
     private final CardRepository cardRepository;
     private final ParkingSessionRepository parkingSessionRepository;
+    private final ReservationRepository reservationRepository;
 
     @Override
     public SlotStatsResponse getSlotStatistics(String dateStr) {
@@ -107,12 +109,24 @@ public class SlotServiceImpl implements SlotService {
 
     @Override
     public void createFloor(com.parking.pbms.dto.FloorRequest request) {
-        if (floorRepository.findByFloorCode(request.floorCode()).isPresent()) {
-            throw new IllegalArgumentException("Mã tầng đã tồn tại");
+        List<Floor> existingFloors = floorRepository.findAll();
+        int maxNum = 0;
+        for (Floor f : existingFloors) {
+            String code = f.getFloorCode();
+            if (code != null && code.startsWith("B")) {
+                try {
+                    int num = Integer.parseInt(code.substring(1));
+                    if (num > maxNum) {
+                        maxNum = num;
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
         }
+        String newFloorCode = "B" + (maxNum + 1);
 
         Floor floor = Floor.builder()
-                .floorCode(request.floorCode())
+                .floorCode(newFloorCode)
                 .floorName(request.floorName())
                 .vehicleType("BOTH")
                 .totalCarSlots(request.totalCarSlots())
@@ -135,5 +149,18 @@ public class SlotServiceImpl implements SlotService {
         floor.setTotalSlots(request.totalCarSlots() + request.totalMotorcycleSlots());
 
         floorRepository.save(floor);
+    }
+
+    @Override
+    public void deleteFloor(Integer floorId) {
+        Floor floor = floorRepository.findById(floorId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tầng đỗ xe"));
+
+        if (parkingSessionRepository.existsByEntryFloorId(floorId) ||
+            reservationRepository.existsByFloorId(floorId)) {
+            throw new IllegalArgumentException("Không thể xóa tầng này vì đã có dữ liệu đặt vé hoặc ra vào.");
+        }
+
+        floorRepository.delete(floor);
     }
 }

@@ -9,6 +9,7 @@ import {
   Plus,
   Edit,
   X,
+  Trash2,
 } from "lucide-react";
 
 import { cls } from "../common/ui";
@@ -16,6 +17,7 @@ import {
   staffService,
   SlotStatsResponse,
 } from "../../../services/staffService";
+import { authService } from "../../../services/authService";
 
 export default function AdminFloorSlot() {
   const getTodayString = () => {
@@ -27,6 +29,7 @@ export default function AdminFloorSlot() {
   };
 
   const [dateStr, setDateStr] = useState<string>(getTodayString());
+  const currentUserRole = authService.getCurrentUser()?.role;
   const [stats, setStats] = useState<SlotStatsResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -62,6 +65,22 @@ export default function AdminFloorSlot() {
   const handleUpdate = () => {
     fetchStats(dateStr);
     setSuccessMsg("Đã cập nhật dữ liệu thành công!");
+    setTimeout(() => setSuccessMsg(null), 2500);
+  };
+
+  const handleDeleteFloor = async (floorId: number, floorName: string) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa ${floorName}?\nLưu ý: Chỉ có thể xóa nếu không có dữ liệu check-in/out hay đặt vé.`)) return;
+    
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      await staffService.deleteFloor(floorId);
+      setSuccessMsg(`Đã xóa ${floorName} thành công!`);
+      fetchStats(dateStr);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Đã xảy ra lỗi khi xóa.");
+      setLoading(false);
+    }
     setTimeout(() => setSuccessMsg(null), 2500);
   };
 
@@ -129,13 +148,15 @@ export default function AdminFloorSlot() {
             Thông tin tầng đỗ xe
           </h1>
         </div>
-        <button
-          onClick={openCreateModal}
-          className="flex h-9 items-center gap-2 rounded bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4" />
-          Thêm tầng mới
-        </button>
+        {currentUserRole === 'admin' && (
+          <button
+            onClick={openCreateModal}
+            className="flex h-9 items-center gap-2 rounded bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4" />
+            Thêm tầng mới
+          </button>
+        )}
       </div>
 
       {/* Date Filter Card */}
@@ -231,14 +252,16 @@ export default function AdminFloorSlot() {
                 <th className="px-4 py-3 text-center">Trống ô tô</th>
                 <th className="px-4 py-3 text-center">Tổng slot xe máy</th>
                 <th className="px-4 py-3 text-center">Trống xe máy</th>
-                <th className="px-4 py-3 text-center">Thao tác</th>
+                {currentUserRole === 'admin' && (
+                  <th className="px-4 py-3 text-center">Thao tác</th>
+                )}
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={currentUserRole === 'admin' ? 6 : 5}
                     className="px-4 py-12 text-center text-gray-400 text-sm"
                   >
                     <div className="flex justify-center items-center gap-2">
@@ -250,7 +273,7 @@ export default function AdminFloorSlot() {
               ) : !stats || stats.floorStats.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={currentUserRole === 'admin' ? 6 : 5}
                     className="px-4 py-12 text-center text-gray-400 text-sm"
                   >
                     Không tìm thấy dữ liệu thống kê nào.
@@ -286,15 +309,24 @@ export default function AdminFloorSlot() {
                         {floor.availableMotorcycleSlots}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 text-center">
-                      <button
-                        onClick={() => openEditModal(floor)}
-                        className="text-gray-500 hover:text-blue-600 transition p-1"
-                        title="Chỉnh sửa slot"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                    </td>
+                    {currentUserRole === 'admin' && (
+                      <td className="px-4 py-3.5 text-center">
+                        <button
+                          onClick={() => openEditModal(floor)}
+                          className="text-gray-500 hover:text-blue-600 transition p-1"
+                          title="Chỉnh sửa slot"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFloor(floor.floorId, floor.floorName)}
+                          className="text-gray-500 hover:text-red-600 transition p-1 ml-2"
+                          title="Xóa tầng"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
@@ -320,23 +352,23 @@ export default function AdminFloorSlot() {
             </div>
             
             <form onSubmit={handleSubmitFloor} className="space-y-4">
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-gray-600">
-                  Mã tầng <span className="text-red-500">*</span>
-                </label>
-                <input
-                  required
-                  disabled={Boolean(editingFloor)}
-                  value={floorForm.floorCode}
-                  onChange={(e) =>
-                    setFloorForm({ ...floorForm, floorCode: e.target.value })
-                  }
-                  className={`w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none ${
-                    editingFloor ? "bg-gray-100" : ""
-                  }`}
-                  placeholder="VD: B3"
-                />
-              </div>
+              {editingFloor && (
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-600">
+                    Mã tầng <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    required
+                    disabled
+                    value={floorForm.floorCode}
+                    onChange={(e) =>
+                      setFloorForm({ ...floorForm, floorCode: e.target.value })
+                    }
+                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none bg-gray-100"
+                    placeholder="VD: B3"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-gray-600">

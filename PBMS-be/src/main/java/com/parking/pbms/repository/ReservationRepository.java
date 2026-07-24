@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     Optional<Reservation> findByReservationNo(String reservationNo);
+    boolean existsByFloorId(Integer floorId);
 
     @Query("SELECT COUNT(r) FROM Reservation r JOIN Vehicle v ON r.vehicleId = v.vehicleId " +
            "WHERE r.floorId = :floorId AND v.vehicleType = :vehicleType " +

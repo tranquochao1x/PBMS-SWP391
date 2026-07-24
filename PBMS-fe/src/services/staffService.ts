@@ -349,5 +349,13 @@ export const staffService = {
     });
     const result: ApiResponse<void> = await safeJson(response);
     if (!response.ok) throw new Error(result.message || "Lỗi cập nhật tầng đỗ xe.");
+  },
+
+  async deleteFloor(floorId: number): Promise<void> {
+    const response = await authFetch(`${API_URL}/slots/floors/${floorId}`, {
+      method: "DELETE",
+    });
+    const result: ApiResponse<void> = await safeJson(response);
+    if (!response.ok) throw new Error(result.message || "Lỗi xóa tầng đỗ xe.");
   }
 };

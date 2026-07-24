@@ -20,6 +20,8 @@ public interface ParkingSessionRepository extends JpaRepository<ParkingSession, 
 
     long countByEntryFloorIdAndVehicleTypeAndStatus(Integer entryFloorId, String vehicleType, String status);
     
+    boolean existsByEntryFloorId(Integer entryFloorId);
+    
     @Query("SELECT COUNT(t) FROM ParkingSession t WHERE " +
            "t.vehicleType = :vehicleType AND " +
            "t.entryFloorId = :floorId AND " +

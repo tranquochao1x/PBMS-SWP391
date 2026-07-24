@@ -79,17 +79,13 @@ public class UserCardServiceImpl implements UserCardService {
         // Find preferred floor if provided
         Integer preferredFloorId = null;
         if (request.tangGuiXe() != null && !request.tangGuiXe().trim().isEmpty()) {
-            String floorCode = "B1";
-            if (request.tangGuiXe().contains("B2")) {
-                floorCode = "B2";
-            } else if (request.tangGuiXe().contains("B3")) {
-                floorCode = "B3";
-            }
+            String floorCode = request.tangGuiXe().replace("Tầng ", "").replace("Tầng hầm ", "").trim();
             Floor floor = floorRepository.findByFloorCode(floorCode).orElse(null);
             if (floor != null) {
                 preferredFloorId = floor.getFloorId();
             }
         }
+
 
         // Calculate Expiry Date based on startDate
         LocalDate startDate = request.startDate() != null ? request.startDate() : LocalDate.now();
@@ -298,7 +294,7 @@ public class UserCardServiceImpl implements UserCardService {
         String nhomThe = group != null ? group.getGroupName() : "";
         String loaiXe = group != null ? (group.getVehicleType().equalsIgnoreCase("MOTORCYCLE") ? "Xe máy" : "Ô tô") : "";
         String bienSo = vehicle != null ? vehicle.getPlateNo() : "";
-        String tangGuiXe = floor != null ? (floor.getFloorCode().equals("B1") ? "Tầng B1" : floor.getFloorCode().equals("B2") ? "Tầng B2" : floor.getFloorName()) : null;
+        String tangGuiXe = floor != null ? floor.getFloorCode() : null;
 
         // Calculate remaining days
         int remainingDays = 0;

@@ -48,4 +48,15 @@ public class SlotController {
                 ApiResponse.success(200, "Cập nhật thông tin tầng đỗ xe thành công", null)
         );
     }
+
+    @DeleteMapping("/floors/{floorId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteFloor(
+            @PathVariable Integer floorId
+    ) {
+        slotService.deleteFloor(floorId);
+        return ResponseEntity.ok(
+                ApiResponse.success(200, "Xóa tầng đỗ xe thành công", null)
+        );
+    }
 }

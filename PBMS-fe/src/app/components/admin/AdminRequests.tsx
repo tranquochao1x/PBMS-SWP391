@@ -42,6 +42,82 @@ const mapStatusToVi = (status: string) => {
   }
 };
 
+const renderDescription = (desc: string) => {
+  const isLostTicket = desc.includes("**BÁO MẤT VÉ XE**");
+  
+  const extractImg = (tag: string) => {
+    const regex = new RegExp(`\\[${tag}\\]([\\s\\S]*?)\\[\\/${tag}\\]`);
+    const match = desc.match(regex);
+    return match ? match[1] : null;
+  };
+
+  const cccdFront = extractImg("IMG_CCCD_FRONT");
+  const cccdBack = extractImg("IMG_CCCD_BACK");
+  const vReg = extractImg("IMG_VEHICLE_REG");
+
+  let textDesc = desc
+    .replace(/\[IMG_CCCD_FRONT\][\s\S]*?\[\/IMG_CCCD_FRONT\]/g, "")
+    .replace(/\[IMG_CCCD_BACK\][\s\S]*?\[\/IMG_CCCD_BACK\]/g, "")
+    .replace(/\[IMG_VEHICLE_REG\][\s\S]*?\[\/IMG_VEHICLE_REG\]/g, "");
+
+  if (isLostTicket) {
+    const lines = textDesc.split("\n").filter(l => l.trim() !== "" && !l.includes("**BÁO MẤT VÉ XE**"));
+    return (
+      <div className="mt-2 space-y-3">
+        <div className="bg-red-50 text-red-700 font-bold px-3 py-2 rounded border border-red-200 text-center">
+          📄 BIÊN BẢN THẤT LẠC THẺ XE
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 text-sm space-y-2">
+          {lines.map((line, idx) => {
+            const parts = line.replace("- ", "").split(":");
+            if (parts.length < 2) return <div key={idx} className="text-gray-700">{line}</div>;
+            const key = parts[0].trim();
+            const val = parts.slice(1).join(":").trim();
+            return (
+              <div key={idx} className="flex flex-col sm:flex-row py-1.5 border-b border-gray-50 last:border-0">
+                <span className="font-semibold text-gray-500 sm:w-1/3">{key}</span>
+                <span className="text-gray-900 font-medium sm:w-2/3">{val}</span>
+              </div>
+            );
+          })}
+        </div>
+        
+        {(cccdFront || cccdBack || vReg) && (
+          <div className="mt-4">
+            <h4 className="font-semibold text-gray-700 mb-2 border-b border-gray-200 pb-1">Ảnh chứng minh đính kèm</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+              {cccdFront && (
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 block">CCCD (Mặt trước)</span>
+                  <img src={cccdFront} alt="CCCD Front" className="w-full h-32 object-cover rounded border border-gray-300 shadow-sm" />
+                </div>
+              )}
+              {cccdBack && (
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 block">CCCD (Mặt sau)</span>
+                  <img src={cccdBack} alt="CCCD Back" className="w-full h-32 object-cover rounded border border-gray-300 shadow-sm" />
+                </div>
+              )}
+              {vReg && (
+                <div className="space-y-1 sm:col-span-2">
+                  <span className="text-xs font-medium text-gray-500 block">Cà vẹt xe</span>
+                  <img src={vReg} alt="Vehicle Registration" className="w-full h-40 object-cover rounded border border-gray-300 shadow-sm" />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-gray-700 whitespace-pre-wrap text-sm leading-relaxed">
+      {textDesc}
+    </div>
+  );
+};
+
 export default function AdminRequests() {
   const [requests, setRequests] = useState<RequestSupportDto[]>([]);
   const [staffs, setStaffs] = useState<StaffMinimalDto[]>([]);
@@ -389,10 +465,7 @@ export default function AdminRequests() {
                     : "—"}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-gray-100 pb-1">
-                <span className="text-gray-500">Phân công cho:</span>
-                <span>{viewItem.assignedStaffName || "—"}</span>
-              </div>
+
               <div className="flex justify-between border-b border-gray-100 pb-1">
                 <span className="text-gray-500">Xử lý lúc:</span>
                 <span>
@@ -410,13 +483,11 @@ export default function AdminRequests() {
                 </span>
               </div>
 
-              <div className="space-y-1 bg-gray-50 rounded p-2.5 border border-gray-200 mt-2">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <div className="space-y-1 mt-3">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                   Nội dung chi tiết:
                 </div>
-                <div className="text-gray-700 whitespace-pre-wrap text-xs font-mono">
-                  {viewItem.description}
-                </div>
+                {renderDescription(viewItem.description)}
               </div>
 
               {viewItem.adminNote && (

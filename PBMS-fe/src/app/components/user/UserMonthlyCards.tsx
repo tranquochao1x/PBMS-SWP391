@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cardService } from "../../../services/cardService";
+import { staffService } from "../../../services/staffService";
 
 /* ── VietQR config (tài khoản nhận tiền của bãi xe) ─────────────── */
 const VQR_BANK_BIN = "970432";
@@ -220,11 +221,22 @@ function AddCardModal({
   const [myVehicles, setMyVehicles] = useState<
     import("../../../services/cardService").VehicleDto[]
   >([]);
+  
+  const [activeFloors, setActiveFloors] = useState<{floorCode: string, floorName: string}[]>([]);
+
   useEffect(() => {
     cardService
       .getMyVehicles()
       .then(setMyVehicles)
       .catch(() => setMyVehicles([]));
+
+    staffService
+      .getFloors()
+      .then((data) => {
+        const active = data.filter((f) => f.status === "ACTIVE");
+        setActiveFloors(active);
+      })
+      .catch(() => setActiveFloors([]));
   }, []);
 
   const F = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
@@ -381,21 +393,25 @@ function AddCardModal({
             <label className="block text-xs text-gray-600 mb-1">
               Tầng gửi xe <span className="text-red-500">*</span>
             </label>
-            <div className="flex gap-2">
-              {["Tầng B1", "Tầng B2"].map((t) => (
-                <label
-                  key={t}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded border-2 cursor-pointer text-sm font-semibold transition-colors ${form.tangGuiXe === t ? "border-amber-500 bg-amber-50 text-amber-700" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}
-                >
-                  <input
-                    type="radio"
-                    className="hidden"
-                    checked={form.tangGuiXe === t}
-                    onChange={() => F("tangGuiXe", t)}
-                  />
-                  {t}
-                </label>
-              ))}
+            <div className="flex flex-wrap gap-2">
+              {activeFloors.length === 0 ? (
+                <span className="text-xs text-gray-400 italic py-2">Đang tải danh sách tầng...</span>
+              ) : (
+                activeFloors.map((f) => (
+                  <label
+                    key={f.floorCode}
+                    className={`flex-1 min-w-[80px] flex items-center justify-center gap-2 py-2 rounded border-2 cursor-pointer text-sm font-semibold transition-colors ${form.tangGuiXe === f.floorCode ? "border-amber-500 bg-amber-50 text-amber-700" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}
+                  >
+                    <input
+                      type="radio"
+                      className="hidden"
+                      checked={form.tangGuiXe === f.floorCode}
+                      onChange={() => F("tangGuiXe", f.floorCode)}
+                    />
+                    {f.floorCode}
+                  </label>
+                ))
+              )}
             </div>
           </div>
           <div>
