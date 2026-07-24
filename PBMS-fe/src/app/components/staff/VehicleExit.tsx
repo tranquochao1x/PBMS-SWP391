@@ -78,6 +78,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
   // Exit flow plate scanner states
   const [exitImage, setExitImage] = useState<string | null>(null);
   const [exitPlate, setExitPlate] = useState("");
+  const [exitPlateInput, setExitPlateInput] = useState("");
   const [isOcrScanning, setIsOcrScanning] = useState(false);
   const [ocrError, setOcrError] = useState<string | null>(null);
   const [plateMatchConfirmed, setPlateMatchConfirmed] = useState(false);
@@ -95,11 +96,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
   const exitStreamRef = useRef<MediaStream | null>(null);
   const exitPlateFileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Manage ticket QR camera feed
-  const [qrCameraActive, setQrCameraActive] = useState(false);
-  const qrVideoRef = useRef<HTMLVideoElement | null>(null);
-  const qrStreamRef = useRef<MediaStream | null>(null);
-  const qrFileInputRef = useRef<HTMLInputElement | null>(null);
+
 
   const startExitCamera = async () => {
     setErrorMsg(null);
@@ -338,7 +335,7 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
 
       // Proceed to Step 2
       setCheckoutStep("exit-plate");
-      setInputCode(""); // Reset input field to accept exit plate or manual plate input
+      setExitPlateInput(""); // Reset exit plate input field
     } catch (err: any) {
       setTicket(null);
       setNotFound(true);
@@ -373,131 +370,10 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
     setExitImage(null);
     setExitPlate("");
     setInputCode("");
+    setExitPlateInput("");
     setPlateMatchConfirmed(false);
     setCheckoutStep("barcode");
     stopExitCamera();
-    stopQrCamera();
-  };
-
-  // QR Camera functions for ticket barcode scanning
-  const runTicketScannerOCR = async (base64Image: string, dataUrl: string) => {
-    setErrorMsg(null);
-    setNotFound(false);
-    setIsOcrScanning(true);
-
-    try {
-      const apiKey = GEMINI_API_KEY;
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-robotics-er-1.6-preview:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: 'Identify and extract the ticket number, card barcode, or reservation code (e.g. TK000003, CARD000005, RES001, KZP1234567) from this ticket image. Clean the output by removing all spaces, dots, and dashes. Return ONLY a JSON object with format {"code": "KZP1234567"}.',
-                  },
-                  { inlineData: { mimeType: "image/jpeg", data: base64Image } },
-                ],
-              },
-            ],
-            generationConfig: { responseMimeType: "application/json" },
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error("Gemini API Error:", errText);
-        throw new Error(`Lỗi từ Gemini API (${response.status}): Vui lòng kiểm tra lại API Key.`);
-      }
-      const resData = await response.json();
-      const text = resData.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error("Không nhận diện được phản hồi.");
-
-      const parsed = JSON.parse(text);
-      const recognized = (parsed.code || "")
-        .trim()
-        .toUpperCase()
-        .replace(/[^A-Z0-9]/g, "");
-      if (!recognized)
-        throw new Error("Không tìm thấy mã vé/barcode trong ảnh.");
-
-      setInputCode(recognized);
-      setIsOcrScanning(false);
-      processCheckOut(recognized);
-    } catch (err: any) {
-      console.error(err);
-      setErrorMsg(err.message || "Không thể nhận diện barcode vé.");
-      setIsOcrScanning(false);
-    }
-  };
-
-  const startQrCamera = async () => {
-    setQrCameraActive(true);
-    setErrorMsg(null);
-    setNotFound(false);
-
-    if (!navigator || !navigator.mediaDevices) {
-      setErrorMsg("Trình duyệt không hỗ trợ camera.");
-      setQrCameraActive(false);
-      return;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
-      qrStreamRef.current = stream;
-      if (qrVideoRef.current) {
-        qrVideoRef.current.srcObject = stream;
-      }
-    } catch (err) {
-      console.error("Camera access failed", err);
-      setErrorMsg("Không thể truy cập camera. Vui lòng cấp quyền.");
-      setQrCameraActive(false);
-    }
-  };
-
-  const stopQrCamera = () => {
-    if (qrStreamRef.current) {
-      qrStreamRef.current.getTracks().forEach((track) => track.stop());
-      qrStreamRef.current = null;
-    }
-    setQrCameraActive(false);
-  };
-
-  const handleQrCapture = () => {
-    if (qrVideoRef.current) {
-      const video = qrVideoRef.current;
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/jpeg");
-        const base64Image = dataUrl.split(",")[1];
-        runTicketScannerOCR(base64Image, dataUrl);
-        stopQrCamera();
-      }
-    }
-  };
-
-  const handleQrFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const dataUrl = reader.result as string;
-      const base64Image = dataUrl.split(",")[1];
-      runTicketScannerOCR(base64Image, dataUrl);
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
   };
 
   return (
@@ -516,7 +392,9 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
         {/* Main interactive panel */}
         <div className="overflow-hidden rounded border border-gray-200 bg-white shadow-sm flex flex-col justify-between min-h-[480px]">
           {/* Step 1: Barcode Entry */}
-          {checkoutStep === "barcode" && (
+          {(checkoutStep === "barcode" ||
+            checkoutStep === "exit-plate" ||
+            checkoutStep === "compare") && (
             <div>
               <div className="flex items-center gap-2 bg-blue-600 px-4 py-2.5">
                 <QrCode className="h-4 w-4 text-white" />
@@ -563,106 +441,13 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-[11px] text-gray-400 py-1">
-                  <div className="h-px flex-1 bg-gray-200" />
-                  <span>hoặc quét barcode qua camera</span>
-                  <div className="h-px flex-1 bg-gray-200" />
-                </div>
-
-                <div className="relative overflow-hidden rounded-lg border border-dashed border-gray-300 bg-slate-950 flex flex-col justify-center items-center p-4">
-                  <video
-                    ref={qrVideoRef}
-                    autoPlay
-                    className={`h-48 w-full object-cover rounded ${qrCameraActive ? "block" : "hidden"}`}
-                    playsInline
-                    muted
-                  />
-                  {!qrCameraActive && !isOcrScanning && (
-                    <div className="flex flex-col items-center justify-center gap-2 py-4">
-                      <ScanLine className="h-10 w-10 text-gray-500" />
-                      <p className="text-[11px] text-gray-400">
-                        Nhấn{" "}
-                        <span
-                          className="font-semibold text-blue-400 cursor-pointer"
-                          onClick={startQrCamera}
-                        >
-                          Mở camera quét vé
-                        </span>{" "}
-                        hoặc{" "}
-                        <span
-                          className="font-semibold text-amber-400 cursor-pointer"
-                          onClick={() => qrFileInputRef.current?.click()}
-                        >
-                          Tải ảnh vé
-                        </span>
-                      </p>
-                    </div>
-                  )}
-
-                  {isOcrScanning && (
-                    <div className="flex flex-col items-center justify-center gap-2 py-4">
-                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent border-sky-400" />
-                      <span className="text-xs text-sky-400 font-medium">
-                        Đang nhận diện barcode thẻ...
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="flex gap-2 mt-3 w-full">
-                    {qrCameraActive ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={handleQrCapture}
-                          className="flex-1 flex h-[34px] items-center justify-center gap-1.5 rounded bg-green-600 text-xs font-semibold text-white hover:bg-green-700 transition-colors"
-                        >
-                          <Camera className="w-3.5 h-3.5" />
-                          Chụp ảnh
-                        </button>
-                        <button
-                          type="button"
-                          onClick={stopQrCamera}
-                          className="flex h-[34px] items-center gap-1 rounded bg-red-500 px-3 text-xs font-semibold text-white hover:bg-red-650 transition-colors"
-                        >
-                          Hủy
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={startQrCamera}
-                        disabled={isOcrScanning}
-                        className="flex-1 flex h-[34px] items-center justify-center gap-1.5 rounded bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700 disabled:bg-blue-300 transition-colors"
-                      >
-                        <Camera className="w-3.5 h-3.5" />
-                        Mở camera quét vé
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => qrFileInputRef.current?.click()}
-                      disabled={isOcrScanning || qrCameraActive}
-                      className="flex h-[34px] items-center gap-1 rounded border border-amber-400 bg-amber-50 px-3 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-100 disabled:opacity-40"
-                    >
-                      <Upload className="w-3.5 h-3.5" />
-                      Tải ảnh
-                    </button>
-                    <input
-                      ref={qrFileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleQrFileUpload}
-                    />
-                  </div>
-                </div>
               </div>
             </div>
           )}
 
           {/* Step 2: Exit Plate Scan */}
-          {checkoutStep === "exit-plate" && (
+          {(checkoutStep === "exit-plate" ||
+            checkoutStep === "compare") && (
             <div>
               <div className="flex items-center gap-2 bg-blue-600 px-4 py-2.5">
                 <Camera className="h-4 w-4 text-white" />
@@ -814,27 +599,27 @@ export default function VehicleExit({ selectedFloorCode }: VehicleExitProps) {
                   <input
                     className="h-[38px] flex-1 rounded border border-gray-300 px-3 text-sm outline-none transition focus:border-blue-400 uppercase font-bold tracking-wider"
                     placeholder="VD: 29A12345"
-                    value={inputCode}
+                    value={exitPlateInput}
                     onChange={(event) =>
-                      setInputCode(event.target.value.replace(/[\s.\-]/g, "").toUpperCase())
+                      setExitPlateInput(event.target.value.replace(/[\s.\-]/g, "").toUpperCase())
                     }
                     onKeyDown={(event) => {
                       if (
                         event.key === "Enter" &&
-                        inputCode.trim().length > 0
+                        exitPlateInput.trim().length > 0
                       ) {
-                        setExitPlate(inputCode.trim());
-                        handleComparePlates(inputCode.trim());
+                        setExitPlate(exitPlateInput.trim());
+                        handleComparePlates(exitPlateInput.trim());
                       }
                     }}
                   />
                   <button
                     type="button"
                     onClick={() => {
-                      setExitPlate(inputCode.trim());
-                      handleComparePlates(inputCode.trim());
+                      setExitPlate(exitPlateInput.trim());
+                      handleComparePlates(exitPlateInput.trim());
                     }}
-                    disabled={!inputCode.trim()}
+                    disabled={!exitPlateInput.trim()}
                     className="flex h-[38px] items-center gap-1.5 rounded bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
                   >
                     Đối chiếu
